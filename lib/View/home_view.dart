@@ -7,6 +7,8 @@ import '../screens/mindful_hours/mindful_hours_screen.dart';
 import '../screens/mood_tracker/mood_tracker_screen.dart';
 import '../screens/sleep_quality/sleep_quality_overview_screen.dart';
 import '../screens/therapy_chatbot/therapy_chatbot_screen.dart';
+import '../screens/journal/journal_new_screen.dart';
+import '../screens/mood_tracker/mood_tracker_screen.dart';
 
 class HomeView extends StatefulWidget {
   static const String routeName = '/dashboard';
@@ -37,9 +39,26 @@ class _HomeViewState extends State<HomeView> {
           currentIndex: _navIndex,
           onItemSelected: (index) {
             setState(() => _navIndex = index);
+            switch (index) {
+              case 0:
+                // Home tab (stay on HomeView)
+                break;
+              case 1:
+                // Chat tab
+                Get.toNamed(TherapyChatbotScreen.routeName);
+                break;
+              case 2:
+                // Stats tab
+                Get.toNamed('/dashboard/stats');
+                break;
+              case 3:
+                // Profile tab
+                Get.toNamed('/profile');
+                break;
+            }
           },
           onCenterTap: () {
-            Get.toNamed(TherapyChatbotScreen.routeName);
+            Get.toNamed(JournalNewScreen.routeName);
           },
         ),
       ),
@@ -170,6 +189,34 @@ class _HomeHeader extends StatelessWidget {
           const SizedBox(height: 24),
           const _SearchBar(),
         ],
+      ),
+    );
+  }
+}
+class _MoodChip extends StatelessWidget {
+  const _MoodChip({
+    required this.label,
+    required this.color,
+  });
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w600,
+            ),
       ),
     );
   }
@@ -309,18 +356,17 @@ class _MindfulTrackerSection extends StatelessWidget {
             title: 'Mindful Journal',
             subtitle: '64 Day Streak',
             trailing: const _JournalHeatmap(),
-            onTap: () => Navigator.of(context).pushNamed(
-              '/journal/overview',
-            ),
+            onTap: () => Get.toNamed(JournalNewScreen.routeName),
           ),
           const SizedBox(height: _cardSpacing),
-          const _TrackerCard(
-            background: Color(0xFFFFF3DF),
-            iconColor: Color(0xFFE4A03E),
+          _TrackerCard(
+            background: const Color(0xFFFFF3DF),
+            iconColor: const Color(0xFFE4A03E),
             icon: Icons.emoji_people_rounded,
             title: 'Stress Level',
             subtitle: 'Level 3 (Normal)',
-            trailing: _StressLevelBar(level: 3, totalLevels: 5),
+            trailing: const _StressLevelBar(level: 3, totalLevels: 5),
+            onTap: () => Get.toNamed('/stress/overview'),
           ),
           const SizedBox(height: _cardSpacing),
           const _MoodTrackerCard(),
@@ -731,35 +777,6 @@ class _MoodTrackerCard extends StatelessWidget {
             const _MoodTrackerFlow(),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _MoodChip extends StatelessWidget {
-  const _MoodChip({
-    required this.label,
-    required this.color,
-  });
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
       ),
     );
   }
