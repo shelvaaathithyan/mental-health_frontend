@@ -56,7 +56,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: Column(
                     children: [
                       Text(
-                        'Sign In To freud.ai',
+                        'Sign In To Neptune.ai',
                         style: theme.textTheme.displayMedium?.copyWith(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,

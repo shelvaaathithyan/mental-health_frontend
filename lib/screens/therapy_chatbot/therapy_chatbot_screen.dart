@@ -297,7 +297,7 @@ class _TherapyChatbotScreenState extends State<TherapyChatbotScreen> {
             ),
             const SizedBox(height: 32),
             Text(
-              'Talk to Doctor Freud AI',
+              'Talk to Neptune AI',
               style: theme.textTheme.displayMedium?.copyWith(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
@@ -568,7 +568,7 @@ class _LimitedKnowledgeBanner extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'No human being is perfect. So is chatbots. Dr Freud’s knowledge is limited to 2025.',
+            'No human being is perfect. So are chatbots. Neptune’s knowledge is limited to 2025.',
             style: theme.textTheme.bodyLarge?.copyWith(
               color: FreudColors.textDark.withValues(alpha: 0.7),
               fontWeight: FontWeight.w500,
@@ -1503,7 +1503,7 @@ class _EmotionTag {
 
   factory _EmotionTag.thinking() {
     return const _EmotionTag(
-      label: 'Emma is thinking...',
+  label: 'Neptune is thinking...',
       background: Color(0xFFE8F1FF),
       textColor: Color(0xFF35507A),
       icon: Icons.auto_awesome,

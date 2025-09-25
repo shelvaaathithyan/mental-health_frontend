@@ -3,10 +3,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 
 import '../../Widgets/custom_button.dart';
+import '../../View/home_view.dart';
 import '../../core/theme.dart';
 import 'assessment/assessment_flow_screen.dart';
 import '../auth/signin/signin_screen.dart';
-import '../dashboard/mental_health_dashboard_screen.dart';
 
 /// Onboarding screen introducing Emma with a warm, calming layout.
 class OnboardingScreen extends StatefulWidget {
@@ -87,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
                 // --- Headline & Tagline ---
                 Text(
-                  'Emma',
+                  'Neptune',
                   style: theme.textTheme.displayLarge?.copyWith(fontSize: 32),
                   textAlign: TextAlign.center,
                 ).animate(delay: 150.ms).fadeIn(duration: 500.ms),
@@ -105,7 +105,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
                 // --- CTA ---
                 CustomButton(
-                  text: 'Start with Emma',
+                  text: 'Start with Neptune',
                   onPressed: () {
                     Navigator.of(context)
                         .pushReplacementNamed(AssessmentFlowScreen.routeName);
@@ -117,7 +117,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
                 TextButton(
                   onPressed: () {
-                    Get.offAllNamed(MentalHealthDashboardScreen.routeName);
+                    Get.offAllNamed(HomeView.routeName);
                   },
                   style: TextButton.styleFrom(
                     foregroundColor:

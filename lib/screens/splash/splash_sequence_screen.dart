@@ -84,7 +84,7 @@ class _BrandSplash extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               Text(
-                'freud.ai',
+                'Neptune.ai',
                 style: theme.textTheme.displayMedium?.copyWith(
                   fontSize: 28,
                   letterSpacing: 1.1,

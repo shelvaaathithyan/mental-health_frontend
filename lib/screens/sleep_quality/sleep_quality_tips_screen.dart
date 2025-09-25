@@ -216,7 +216,7 @@ class _RoutineBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Emma Routine',
+                  'Neptune Routine',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: FreudColors.textLight.withValues(alpha: 0.74),
                   ),

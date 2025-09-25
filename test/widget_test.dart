@@ -31,7 +31,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Sign In To freud.ai'), findsOneWidget);
+  expect(find.text('Sign In To Neptune.ai'), findsOneWidget);
     expect(find.text('Email Address'), findsOneWidget);
     expect(find.text('Password'), findsOneWidget);
   });

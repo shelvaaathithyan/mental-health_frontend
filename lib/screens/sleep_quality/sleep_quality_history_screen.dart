@@ -123,7 +123,7 @@ class _TrendOverview extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '+12 Emma Score vs last week',
+                    '+12 Neptune Score vs last week',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: FreudColors.mossGreen,
                       fontWeight: FontWeight.w600,
