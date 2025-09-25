@@ -1,33 +1,35 @@
-import 'package:ai_therapy/constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
-  final Function onPressed;
+  final VoidCallback onPressed;
   final Color? color;
-  const CustomButton(
-      {super.key,
-      required this.text,
-      required this.onPressed,
-      this.color = buttonColor});
+  const CustomButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final buttonColor = color ?? Theme.of(context).colorScheme.primary;
     return GestureDetector(
-      onTap: () => onPressed(),
+      onTap: onPressed,
       child: Container(
         height: 60,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(50),
+          color: buttonColor,
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Center(
           child: Text(
             text,
-            style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                  color: Colors.white,
-                ),
+            style: Theme.of(context)
+                .textTheme
+                .displaySmall!
+                .copyWith(color: Theme.of(context).colorScheme.onPrimary),
           ),
         ),
       ),

@@ -11,6 +11,8 @@ import 'package:lottie/lottie.dart';
 import '../onBoarding/customize_attributes_screen.dart';
 
 class HomeView extends StatefulWidget {
+  static const String routeName = '/dashboard';
+
   const HomeView({super.key});
 
   @override
