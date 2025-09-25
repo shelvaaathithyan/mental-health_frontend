@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 const buttonColor = Color(0xFF5774E8);
 const textColor = Color(0xFF5551FF);

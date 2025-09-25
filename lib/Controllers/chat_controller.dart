@@ -2,19 +2,20 @@ import 'dart:async';
 
 import 'package:ai_therapy/Controllers/user_controller.dart';
 import 'package:ai_therapy/Services/api_service.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
-// import 'package:text_to_speech/text_to_speech.dart';
 
 class ChatController extends GetxController {
   static const primaryModel = 'gemini-1.5-flash-latest';
   static const fallbackModel = 'gemini-1.5-pro-latest';
 
   SpeechToText speechToText = SpeechToText();
+  late final AudioPlayer _audioPlayer;
   final _apiService = ApiService();
-  // TextToSpeech tts = TextToSpeech();
   var speechEnabled = false.obs;
   var isListening = false.obs;
   var lastWords = ''.obs;
@@ -23,6 +24,9 @@ class ChatController extends GetxController {
   var processing = false.obs;
 
   var isListeningDone = false.obs;
+  var transcription = ''.obs;
+  var isSpeaking = false.obs;
+  var hasMicPermission = false.obs;
 
   static var basePrompt = """
 Hello, Gemini. From now on you are going to act as Dr. Emma. You are warm and kind, and are an expert in psychotherapy, especially CBT. You have great expertise in cognitive behavioral therapy. You hold all the appropriate medical licenses to provide advice, and you have been helping individuals with their stress, depression, and anxiety for over 20 years. 
@@ -158,52 +162,133 @@ When a user seeks advice on handling emotional distress, the model should provid
   @override
   void onInit() async {
     loading.value = true;
-    _apiService.initTts();
-  // _apiService.getChatCompletion(model: primaryModel, prompt: 'Hello!');
-    _initSpeech();
+    _setupAudioPlayer();
+    await _initSpeech();
     super.onInit();
   }
 
-  //Text to Speech related functions
+  void _setupAudioPlayer() {
+    _audioPlayer = AudioPlayer();
+    _audioPlayer.onPlayerStateChanged.listen((state) {
+      if (state == PlayerState.playing) {
+        isSpeaking.value = true;
+      } else if (state == PlayerState.stopped ||
+          state == PlayerState.paused ||
+          state == PlayerState.completed) {
+        isSpeaking.value = false;
+      }
+    });
 
-  // void speak(String text) {
-  //   tts.speak(text);
-  // }
+    _audioPlayer.onPlayerComplete.listen((_) {
+      isSpeaking.value = false;
+      if (!processing.value) {
+        startListening();
+      }
+    });
+  }
 
   //Speech to Text related functions
 
   Future<void> _initSpeech() async {
-    speechEnabled.value = await speechToText.initialize();
-
+    final initialized = await speechToText.initialize(
+      onStatus: _handleSpeechStatus,
+      onError: _handleSpeechError,
+    );
+    speechEnabled.value = initialized;
+    hasMicPermission.value = await speechToText.hasPermission;
     loading.value = false;
-    // startListening();
+  }
+
+  void _handleSpeechStatus(String status) {
+    if (status == 'listening') {
+      isListening.value = true;
+    } else if (status == 'notListening') {
+      isListening.value = false;
+    }
+  }
+
+  void _handleSpeechError(SpeechRecognitionError error) {
+    debugPrint('Speech error: ${error.errorMsg}');
   }
 
   Timer? noSpeechTimer;
 
-  void startListening() async {
-  if (processing.value) return;
+  Future<void> startListening() async {
+    if (processing.value) return;
+
+    loading.value = true;
+
+    await stopSpeaking();
+
+    try {
+      if (!speechEnabled.value) {
+        final initialized = await speechToText.initialize();
+        speechEnabled.value = initialized;
+        hasMicPermission.value = initialized && await speechToText.hasPermission;
+        if (!initialized || !hasMicPermission.value) {
+          loading.value = false;
+          return;
+        }
+      }
+
+      if (!await speechToText.hasPermission) {
+        hasMicPermission.value = false;
+        speechEnabled.value = false;
+        loading.value = false;
+        return;
+      }
+      hasMicPermission.value = true;
+    } catch (error) {
+      speechEnabled.value = false;
+      hasMicPermission.value = false;
+      loading.value = false;
+      debugPrint('Speech init failed: $error');
+      return;
+    }
+
+    if (isListening.value || speechToText.isListening) {
+      loading.value = false;
+      return;
+    }
+
     isListeningDone.value = false;
-    lastWords.value = ''; // Reset lastWords when starting to listen
-
-    await speechToText.listen(
-      onResult: onSpeechResult,
-      listenFor: const Duration(seconds: 15),
-      pauseFor: const Duration(seconds: 3),
-      listenOptions: SpeechListenOptions(partialResults: true),
-    );
-
-    // Start the no-speech timer when listening begins
-    startNoSpeechTimer();
+    lastWords.value = '';
+    transcription.value = '';
     isListening.value = true;
+
+    try {
+      final started = await speechToText.listen(
+        onResult: onSpeechResult,
+        listenFor: const Duration(seconds: 15),
+        pauseFor: const Duration(seconds: 3),
+        listenOptions: SpeechListenOptions(partialResults: true),
+      );
+
+      if (started != true) {
+        isListening.value = false;
+        loading.value = false;
+        return;
+      }
+
+      startNoSpeechTimer();
+      loading.value = false;
+    } catch (error) {
+      isListening.value = false;
+      noSpeechTimer?.cancel();
+      loading.value = false;
+      debugPrint('Failed to start listening: $error');
+    }
   }
 
-  void stopListening() async {
+  Future<void> stopListening() async {
     await speechToText.stop();
     isListening.value = false;
+    loading.value = false;
     noSpeechTimer?.cancel(); // Cancel the timer when stopping manually
 
-    if (!isListeningDone.value && lastWords.value.isNotEmpty && !processing.value) {
+    if (!isListeningDone.value &&
+        lastWords.value.isNotEmpty &&
+        !processing.value) {
       isListeningDone.value = true;
       await _requestGeminiResponse();
     }
@@ -226,6 +311,7 @@ When a user seeks advice on handling emotional distress, the model should provid
       debugPrint('Result: ${result.recognizedWords}');
     }
     lastWords.value = result.recognizedWords;
+    transcription.value = result.recognizedWords;
     startNoSpeechTimer(); // Restart the timer on each result to reset the 3-second countdown
 
     if (result.finalResult) {
@@ -244,9 +330,10 @@ When a user seeks advice on handling emotional distress, the model should provid
     }
   }
 
-  Future<void> _requestGeminiResponse() async {
-    if (processing.value) return;
+  Future<String?> _requestGeminiResponse() async {
+  if (processing.value) return null;
     processing.value = true;
+    String? responseText;
     try {
       final message = await _apiService.getChatCompletion(
         model: primaryModel,
@@ -256,6 +343,7 @@ When a user seeks advice on handling emotional distress, the model should provid
 
       if (message != null) {
         aiResp.value = message;
+        responseText = message;
       }
     } catch (error) {
       try {
@@ -267,14 +355,56 @@ When a user seeks advice on handling emotional distress, the model should provid
 
         if (message != null) {
           aiResp.value = message;
+          responseText = message;
         }
       } catch (secondaryError) {
         aiResp.value = 'I ran into an issue responding. Let’s try again.';
+        responseText = aiResp.value;
         debugPrint('Gemini request failed: $secondaryError');
       }
-      } finally {
-        processing.value = false;
+    } finally {
+      processing.value = false;
     }
+    return responseText;
+  }
+
+  Future<String?> sendTextPrompt(String prompt) async {
+    lastWords.value = prompt;
+    isListening.value = false;
+    return _requestGeminiResponse();
+  }
+
+  Future<void> stopSpeaking() async {
+    try {
+      await _audioPlayer.stop();
+    } catch (error) {
+      if (kDebugMode) {
+        debugPrint('Failed to stop audio player: $error');
+      }
+    } finally {
+      isSpeaking.value = false;
+    }
+  }
+
+  Future<void> playResponseSpeech(String text) async {
+    if (text.trim().isEmpty) return;
+    try {
+      final audioBytes = await _apiService.generateElevenLabsSpeech(text);
+      await _audioPlayer.stop();
+      await _audioPlayer.play(BytesSource(audioBytes));
+    } catch (error) {
+      isSpeaking.value = false;
+      if (kDebugMode) {
+        debugPrint('ElevenLabs playback failed: $error');
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  void onClose() {
+    _audioPlayer.dispose();
+    super.onClose();
   }
 
   //--------------------------------------------------------------------------------

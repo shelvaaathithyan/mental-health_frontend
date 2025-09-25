@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:get/get.dart';
 
 import '../../Widgets/custom_button.dart';
 import '../../core/theme.dart';
+import '../auth/signin/signin_screen.dart';
+import '../dashboard/mental_health_dashboard_screen.dart';
 
 /// Onboarding screen introducing Emma with a warm, calming layout.
 class OnboardingScreen extends StatefulWidget {
   static const String routeName = '/onboarding';
-  static const String dashboardRouteName = '/dashboard';
 
   const OnboardingScreen({super.key});
 
@@ -41,7 +43,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
-  backgroundColor: FreudColors.cream,
+      backgroundColor: FreudColors.cream,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -104,8 +106,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 CustomButton(
                   text: 'Start with Emma',
                   onPressed: () {
-                    Navigator.of(context)
-                        .pushReplacementNamed(OnboardingScreen.dashboardRouteName);
+                    Get.toNamed(SignInScreen.routeName);
                   },
                 ).animate(delay: 350.ms).fadeIn(duration: 500.ms),
 
@@ -113,11 +114,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context)
-                        .pushReplacementNamed(OnboardingScreen.dashboardRouteName);
+                    Get.offAllNamed(MentalHealthDashboardScreen.routeName);
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: FreudColors.textDark.withValues(alpha: 0.7),
+                    foregroundColor:
+                        FreudColors.textDark.withValues(alpha: 0.7),
                     textStyle: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w500,
                     ),

@@ -1,112 +1,55 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-
-import '../Controllers/chat_controller.dart';
-
-enum TtsState { playing, stopped, paused, continued }
 
 class ApiService {
   static const _baseUrl =
       'https://generativelanguage.googleapis.com/v1beta/models';
+  static const _elevenLabsVoiceId = 'QPBKI85w0cdXVqMSJ6WB';
 
   final List<Map<String, String>> conversation = [];
-  static FlutterTts flutterTts = FlutterTts();
-  double volume = 0.7;
-  double pitch = 1.0;
-  double rate = 0.4;
-  Map<String, String>? voice;
 
-  bool isCurrentLanguageInstalled = false;
-
-  TtsState ttsState = TtsState.stopped;
-
-  bool get isPlaying => ttsState == TtsState.playing;
-  bool get isStopped => ttsState == TtsState.stopped;
-  bool get isPaused => ttsState == TtsState.paused;
-  bool get isContinued => ttsState == TtsState.continued;
-
-  bool get isIOS => !kIsWeb && Platform.isIOS;
-  bool get isAndroid => !kIsWeb && Platform.isAndroid;
-  bool get isWindows => !kIsWeb && Platform.isWindows;
-  bool get isWeb => kIsWeb;
-
-  dynamic initTts() {
-    flutterTts = FlutterTts();
-
-    _setAwaitOptions();
-
-    if (isAndroid) {
-      _getDefaultEngine();
-      _getDefaultVoice();
-    }
-  }
-
-  Future<void> _speak(String text) async {
-    await flutterTts.setVolume(volume);
-    await flutterTts.setSpeechRate(rate);
-    await flutterTts.setPitch(pitch);
-
-    await flutterTts.speak(text.replaceAll(",", ""));
-    Get.find<ChatController>().startListening();
-
-    // if (_newVoiceText != null) {
-    //   if (_newVoiceText!.isNotEmpty) {
-    //     await flutterTts.speak(_newVoiceText!);
-    //   } else {
-    //     print("Text to speak is empty");
-    //   }
-    // }
-  }
-
-  Future<void> _setAwaitOptions() async {
-    await flutterTts.awaitSpeakCompletion(true);
-  }
-
-  Future<void> _getDefaultEngine() async {
-    var engine = await flutterTts.getDefaultEngine;
-    if (engine != null && kDebugMode) {
-      debugPrint('Default TTS engine: $engine');
-    }
-  }
-
-  Future<void> _getDefaultVoice() async {
-    // Fetch the list of available voices
-    List<dynamic> voices = await flutterTts.getVoices;
-    if (kDebugMode) {
-      debugPrint('Available voices: $voices');
+  Future<Uint8List> generateElevenLabsSpeech(String text) async {
+    final apiKey = dotenv.env['ELEVENLABS_API_KEY'];
+    if (apiKey == null || apiKey.isEmpty) {
+      throw Exception('Missing ELEVENLABS_API_KEY in environment');
     }
 
-    // Find the en-AU-language voice
-    var selectedVoice = voices.firstWhere(
-      (voice) => voice['locale'] == 'en-AU',
-      orElse: () => null,
+    final uri = Uri.parse(
+        'https://api.elevenlabs.io/v1/text-to-speech/$_elevenLabsVoiceId');
+    final payload = {
+      'text': text,
+      'model_id': 'eleven_monolingual_v1',
+      'voice_settings': {
+        'stability': 0.5,
+        'similarity_boost': 0.75,
+        'style': 0.0,
+        'use_speaker_boost': true,
+      }
+    };
+
+    final response = await http.post(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'audio/mpeg',
+        'xi-api-key': apiKey,
+      },
+      body: jsonEncode(payload),
     );
 
-    if (selectedVoice != null) {
-      voice = {
-        'name': selectedVoice['name'],
-        'locale': selectedVoice['locale'],
-      };
-      await flutterTts.setVoice(voice!);
+    if (response.statusCode != 200) {
       if (kDebugMode) {
-        debugPrint('Selected voice: $voice');
+        debugPrint('ElevenLabs TTS error (${response.statusCode}): '
+            '${response.body}');
       }
-    } else {
-      if (kDebugMode) {
-        debugPrint('Desired voice not found.');
-      }
+      throw Exception('ElevenLabs TTS request failed');
     }
 
-    if (voice != null && kDebugMode) {
-      debugPrint('Active voice: $voice');
-    }
+    return response.bodyBytes;
   }
 
   Future<String?> getChatCompletion(
@@ -118,10 +61,10 @@ class ApiService {
       throw Exception('Missing GEMINI_API_KEY in environment');
     }
 
-  conversation.add({'role': 'user', 'content': prompt});
-  final userIndex = conversation.length - 1;
+    conversation.add({'role': 'user', 'content': prompt});
+    final userIndex = conversation.length - 1;
 
-  final systemInstruction = {
+    final systemInstruction = {
       'parts': [
         {'text': basePrompt}
       ]
@@ -148,8 +91,7 @@ class ApiService {
       }
     };
 
-    final uri =
-        Uri.parse('$_baseUrl/$model:generateContent?key=$apiKey');
+    final uri = Uri.parse('$_baseUrl/$model:generateContent?key=$apiKey');
 
     if (kDebugMode) {
       debugPrint(
@@ -181,7 +123,8 @@ class ApiService {
 
       final Map<String, dynamic> data = jsonDecode(response.body);
       if (kDebugMode) {
-        debugPrint('Gemini response (${response.statusCode}): ${response.body}');
+        debugPrint(
+            'Gemini response (${response.statusCode}): ${response.body}');
       }
       final candidates = data['candidates'] as List<dynamic>?;
       if (candidates == null || candidates.isEmpty) {
@@ -208,9 +151,8 @@ class ApiService {
         throw Exception('Gemini returned empty response');
       }
 
-      conversation.add({'role': 'assistant', 'content': message});
-      await _speak(message);
-      return message;
+  conversation.add({'role': 'assistant', 'content': message});
+  return message;
     } catch (error) {
       if (conversation.length - 1 == userIndex) {
         conversation.removeLast();

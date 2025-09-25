@@ -174,9 +174,9 @@ class _MindfulDonutChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
+    return const CustomPaint(
       painter: _DonutChartPainter(_segments),
-      size: const Size.square(220),
+      size: Size.square(220),
     );
   }
 }

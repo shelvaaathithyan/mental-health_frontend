@@ -1,14 +1,19 @@
+import 'package:ai_therapy/Controllers/user_controller.dart';
 import 'package:ai_therapy/View/home_view.dart';
 import 'package:ai_therapy/core/theme.dart';
+import 'package:ai_therapy/screens/auth/signin/signin_screen.dart';
+import 'package:ai_therapy/screens/auth/signup/signup_screen.dart';
+import 'package:ai_therapy/screens/dashboard/mental_health_dashboard_screen.dart';
+import 'package:ai_therapy/screens/dashboard/stats/stats_screen.dart';
+import 'package:ai_therapy/screens/mindful_hours/mindful_hours_screen.dart';
+import 'package:ai_therapy/screens/mindful_hours/mindful_hours_stats_screen.dart';
 import 'package:ai_therapy/screens/onboarding/onboarding_screen.dart';
 import 'package:ai_therapy/screens/splash/splash_sequence_screen.dart';
+import 'package:ai_therapy/screens/therapy_chatbot/therapy_chatbot_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'screens/dashboard/stats/stats_screen.dart';
-import 'screens/mindful_hours/mindful_hours_screen.dart';
-import 'screens/mindful_hours/mindful_hours_stats_screen.dart';
 
 //import math
 
@@ -17,6 +22,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   await dotenv.load(fileName: ".env");
+  Get.put(UserController(), permanent: true);
   runApp(const MyApp());
 }
 
@@ -54,8 +60,20 @@ class _MyAppState extends State<MyApp> {
           page: () => const OnboardingScreen(),
         ),
         GetPage(
+          name: SignInScreen.routeName,
+          page: () => const SignInScreen(),
+        ),
+        GetPage(
+          name: SignUpScreen.routeName,
+          page: () => const SignUpScreen(),
+        ),
+        GetPage(
           name: HomeView.routeName,
           page: () => const HomeView(),
+        ),
+        GetPage(
+          name: MentalHealthDashboardScreen.routeName,
+          page: () => const MentalHealthDashboardScreen(),
         ),
         GetPage(
           name: StatsScreen.routeName,
@@ -68,6 +86,10 @@ class _MyAppState extends State<MyApp> {
         GetPage(
           name: MindfulHoursStatsScreen.routeName,
           page: () => const MindfulHoursStatsScreen(),
+        ),
+        GetPage(
+          name: TherapyChatbotScreen.routeName,
+          page: () => const TherapyChatbotScreen(),
         ),
       ],
     );

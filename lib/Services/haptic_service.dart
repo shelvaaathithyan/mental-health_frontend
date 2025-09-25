@@ -8,10 +8,10 @@ class HapticService {
     if (kIsWeb) return;
 
     try {
-    final canVibrate = await Vibrate.canVibrate;
-    if (!canVibrate) return;
+      final canVibrate = await Vibrate.canVibrate;
+      if (!canVibrate) return;
 
-    Vibrate.feedback(type);
+      Vibrate.feedback(type);
     } catch (error) {
       debugPrint('HapticService feedback skipped: $error');
     }

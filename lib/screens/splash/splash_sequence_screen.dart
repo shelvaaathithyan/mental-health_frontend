@@ -41,9 +41,8 @@ class _SplashSequenceScreenState extends State<SplashSequenceScreen> {
     await Future.delayed(const Duration(milliseconds: 1800));
     if (!mounted) return;
 
-    final next = widget.isFirstTime
-        ? OnboardingScreen.routeName
-        : HomeView.routeName;
+    final next =
+        widget.isFirstTime ? OnboardingScreen.routeName : HomeView.routeName;
     Get.offAllNamed(next);
   }
 

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 import '../core/theme.dart';
 import '../screens/dashboard/widgets/freud_bottom_navbar.dart';
 import '../screens/mindful_hours/mindful_hours_screen.dart';
+import '../screens/therapy_chatbot/therapy_chatbot_screen.dart';
 
 class HomeView extends StatefulWidget {
   static const String routeName = '/dashboard';
@@ -33,7 +36,9 @@ class _HomeViewState extends State<HomeView> {
           onItemSelected: (index) {
             setState(() => _navIndex = index);
           },
-          onCenterTap: () {},
+          onCenterTap: () {
+            Get.toNamed(TherapyChatbotScreen.routeName);
+          },
         ),
       ),
       body: const SafeArea(
