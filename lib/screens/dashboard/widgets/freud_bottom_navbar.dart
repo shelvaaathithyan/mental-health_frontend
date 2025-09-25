@@ -121,32 +121,48 @@ class _FreudNavTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected
-        ? FreudColors.richBrown
-        : FreudColors.richBrown.withValues(alpha: 0.35);
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 48,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(item.icon, color: color, size: 24),
-            const SizedBox(height: 6),
-            AnimatedOpacity(
-              duration: const Duration(milliseconds: 250),
-              opacity: isSelected ? 1 : 0,
-              child: Container(
-                width: 6,
-                height: 6,
-                decoration: const BoxDecoration(
-                  color: FreudColors.richBrown,
-                  shape: BoxShape.circle,
+    final Color iconColor =
+        isSelected ? FreudColors.mossGreen : FreudColors.richBrown.withValues(alpha: 0.45);
+    final Color labelColor =
+        isSelected ? FreudColors.mossGreen : FreudColors.richBrown.withValues(alpha: 0.55);
+    return Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: SizedBox(
+          width: 64,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(item.icon, color: iconColor, size: 22),
+              const SizedBox(height: 2),
+              Text(
+                item.label,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: labelColor,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontSize: 10,
+                      height: 1.0,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 250),
+                opacity: isSelected ? 1 : 0,
+                child: Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: FreudColors.mossGreen,
+                    shape: BoxShape.circle,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

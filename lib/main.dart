@@ -11,6 +11,7 @@ import 'package:ai_therapy/screens/onboarding/onboarding_screen.dart';
 import 'package:ai_therapy/screens/splash/splash_sequence_screen.dart';
 import 'package:ai_therapy/screens/therapy_chatbot/therapy_chatbot_screen.dart';
 import 'package:ai_therapy/screens/sleep_quality/sleep_quality_overview_screen.dart';
+import 'package:ai_therapy/screens/mood_tracker/mood_tracker_screen.dart';
 
 import 'package:ai_therapy/screens/onboarding/assessment/assessment_flow_screen.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,11 @@ import 'screens/journal/journal_new_screen.dart';
 import 'screens/journal/journal_voice_screen.dart';
 import 'screens/journal/journal_text_screen.dart';
 import 'screens/journal/journal_detail_screen.dart';
+import 'screens/stress/stress_level_screen.dart';
+import 'screens/stress/stress_level_input_screen.dart';
+import 'screens/stress/stress_select_stressors_screen.dart';
 import 'Controllers/journal_controller.dart';
+import 'screens/profile/profile_screen.dart';
 
 //import math
 
@@ -86,13 +91,20 @@ class _MyAppState extends State<MyApp> {
           page: () => const AssessmentFlowScreen(),
         ),
         GetPage(
-          name: HomeView.routeName,
-          page: () => const HomeView(),
+          name: MoodTrackerScreen.routeName,
+          page: () => const MoodTrackerScreen(),
         ),
+        GetPage(name: HomeView.routeName, page: () => const HomeView()),
         GetPage(
           name: MentalHealthDashboardScreen.routeName,
           page: () => const MentalHealthDashboardScreen(),
         ),
+        // Alias route for dashboard navigation
+        GetPage(
+          name: '/dashboard',
+          page: () => const HomeView(),
+        ),
+        GetPage(name: ProfileScreen.routeName, page: () => const ProfileScreen()),
         GetPage(
           name: StatsScreen.routeName,
           page: () => const StatsScreen(),
@@ -127,6 +139,10 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: JournalVoiceScreen.routeName, page: () => const JournalVoiceScreen()),
         GetPage(name: JournalTextScreen.routeName, page: () => const JournalTextScreen()),
         GetPage(name: JournalDetailScreen.routeName, page: () => const JournalDetailScreen()),
+        // Stress management
+        GetPage(name: StressLevelScreen.routeName, page: () => const StressLevelScreen()),
+        GetPage(name: StressLevelInputScreen.routeName, page: () => const StressLevelInputScreen()),
+        GetPage(name: SelectStressorsScreen.routeName, page: () => const SelectStressorsScreen()),
       ],
     );
   }
