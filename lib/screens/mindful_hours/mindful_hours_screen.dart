@@ -121,8 +121,12 @@ class _MindfulContent extends StatelessWidget {
               ),
               const Spacer(),
               _CircleIconButton(
-                icon: Icons.more_horiz,
-                onPressed: () {},
+                icon: Icons.bar_chart_rounded,
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    MindfulHoursStatsScreen.routeName,
+                  );
+                },
               ),
             ],
           ),

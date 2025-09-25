@@ -2,6 +2,7 @@ import 'package:ai_therapy/View/home_view.dart';
 import 'package:ai_therapy/core/theme.dart';
 import 'package:ai_therapy/screens/onboarding/onboarding_screen.dart';
 import 'package:ai_therapy/screens/splash/splash_sequence_screen.dart';
+import 'package:ai_therapy/screens/onboarding/assessment/assessment_flow_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,9 @@ import 'package:get_storage/get_storage.dart';
 import 'screens/dashboard/stats/stats_screen.dart';
 import 'screens/mindful_hours/mindful_hours_screen.dart';
 import 'screens/mindful_hours/mindful_hours_stats_screen.dart';
+import 'screens/sleep_quality/sleep_quality_history_screen.dart';
+import 'screens/sleep_quality/sleep_quality_overview_screen.dart';
+import 'screens/sleep_quality/sleep_quality_tips_screen.dart';
 
 //import math
 
@@ -54,6 +58,10 @@ class _MyAppState extends State<MyApp> {
           page: () => const OnboardingScreen(),
         ),
         GetPage(
+          name: AssessmentFlowScreen.routeName,
+          page: () => const AssessmentFlowScreen(),
+        ),
+        GetPage(
           name: HomeView.routeName,
           page: () => const HomeView(),
         ),
@@ -68,6 +76,18 @@ class _MyAppState extends State<MyApp> {
         GetPage(
           name: MindfulHoursStatsScreen.routeName,
           page: () => const MindfulHoursStatsScreen(),
+        ),
+        GetPage(
+          name: SleepQualityOverviewScreen.routeName,
+          page: () => const SleepQualityOverviewScreen(),
+        ),
+        GetPage(
+          name: SleepQualityHistoryScreen.routeName,
+          page: () => const SleepQualityHistoryScreen(),
+        ),
+        GetPage(
+          name: SleepQualityTipsScreen.routeName,
+          page: () => const SleepQualityTipsScreen(),
         ),
       ],
     );

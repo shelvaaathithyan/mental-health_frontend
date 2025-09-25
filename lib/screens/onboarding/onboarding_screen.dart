@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../Widgets/custom_button.dart';
 import '../../core/theme.dart';
+import 'assessment/assessment_flow_screen.dart';
 
 /// Onboarding screen introducing Emma with a warm, calming layout.
 class OnboardingScreen extends StatefulWidget {
@@ -105,7 +106,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   text: 'Start with Emma',
                   onPressed: () {
                     Navigator.of(context)
-                        .pushReplacementNamed(OnboardingScreen.dashboardRouteName);
+                        .pushReplacementNamed(AssessmentFlowScreen.routeName);
                   },
                 ).animate(delay: 350.ms).fadeIn(duration: 500.ms),
 

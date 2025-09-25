@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../core/theme.dart';
 import '../screens/dashboard/widgets/freud_bottom_navbar.dart';
 import '../screens/mindful_hours/mindful_hours_screen.dart';
+import '../screens/sleep_quality/sleep_quality_overview_screen.dart';
 
 class HomeView extends StatefulWidget {
   static const String routeName = '/dashboard';
@@ -272,22 +273,27 @@ class _MindfulTrackerSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          const _TrackerCard(
-            background: Color(0xFFE7F3E5),
+          _TrackerCard(
+            background: const Color(0xFFE7F3E5),
             iconColor: FreudColors.mossGreen,
             icon: Icons.local_florist_rounded,
             title: 'Mindful Hours',
             subtitle: '2.5h/8h Today',
-            trailing: _MindfulHoursSparkline(),
+            trailing: const _MindfulHoursSparkline(),
+            onTap: () {
+              Navigator.of(context).pushNamed(MindfulHoursScreen.routeName);
+            },
           ),
           const SizedBox(height: _cardSpacing),
-          const _TrackerCard(
-            background: Color(0xFFF1EDFF),
-            iconColor: Color(0xFF7760D3),
+          _TrackerCard(
+            background: const Color(0xFFF1EDFF),
+            iconColor: const Color(0xFF7760D3),
             icon: Icons.nights_stay_rounded,
             title: 'Sleep Quality',
             subtitle: 'Insomniac (~2h Avg)',
-            trailing: _SleepQualityRing(value: 0.2, label: '20'),
+            trailing: const _SleepQualityRing(value: 0.2, label: '20'),
+            onTap: () => Navigator.of(context)
+                .pushNamed(SleepQualityOverviewScreen.routeName),
           ),
           const SizedBox(height: _cardSpacing),
           const _TrackerCard(
@@ -308,13 +314,7 @@ class _MindfulTrackerSection extends StatelessWidget {
             trailing: _StressLevelBar(level: 3, totalLevels: 5),
           ),
           const SizedBox(height: _cardSpacing),
-          const _TrackerCard(
-            background: Color(0xFFFFF8F1),
-            iconColor: Color(0xFFB08B6C),
-            icon: Icons.mood_rounded,
-            title: 'Mood Tracker',
-            trailing: _MoodTrackerFlow(),
-          ),
+          const _MoodTrackerCard(),
         ],
       ),
     );
@@ -331,35 +331,32 @@ class _MindfulJourneyButton extends StatelessWidget {
       child: GestureDetector(
         onTap: () => Navigator.of(context).pushNamed(MindfulHoursScreen.routeName),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [FreudColors.richBrown, Color(0xFF2F1D12)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(32),
+            color: const Color(0xFF3D2418),
+            borderRadius: BorderRadius.circular(36),
             boxShadow: [
               BoxShadow(
-                color: FreudColors.richBrown.withValues(alpha: 0.25),
-                blurRadius: 20,
-                offset: const Offset(0, 12),
+                color: FreudColors.richBrown.withValues(alpha: 0.28),
+                blurRadius: 22,
+                offset: const Offset(0, 14),
               ),
             ],
           ),
           child: Row(
             children: [
               Container(
-                width: 46,
-                height: 46,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.16),
+                  color: Colors.white.withValues(alpha: 0.18),
                   shape: BoxShape.circle,
                 ),
+                alignment: Alignment.center,
                 child: const Icon(Icons.cyclone_rounded,
                     color: FreudColors.textLight, size: 22),
               ),
-              const SizedBox(width: 18),
+              const SizedBox(width: 20),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,8 +379,8 @@ class _MindfulJourneyButton extends StatelessWidget {
                 ),
               ),
               Container(
-                width: 44,
-                height: 44,
+                width: 46,
+                height: 46,
                 decoration: const BoxDecoration(
                   color: FreudColors.textLight,
                   shape: BoxShape.circle,
@@ -411,6 +408,7 @@ class _TrackerCard extends StatelessWidget {
     required this.title,
     required this.trailing,
     this.subtitle,
+    this.onTap,
   });
 
   final Color background;
@@ -419,11 +417,12 @@ class _TrackerCard extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Widget trailing;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
+    final card = Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: background,
@@ -462,6 +461,10 @@ class _TrackerCard extends StatelessWidget {
         ],
       ),
     );
+    if (onTap == null) {
+      return card;
+    }
+    return GestureDetector(onTap: onTap, child: card);
   }
 }
 
@@ -673,6 +676,49 @@ class _MoodTrackerFlow extends StatelessWidget {
             ),
         ],
       ],
+    );
+  }
+}
+
+class _MoodTrackerCard extends StatelessWidget {
+  const _MoodTrackerCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8F1),
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _TrackerIconBadge(
+                icon: Icons.mood_rounded,
+                color: Color(0xFFB08B6C),
+              ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Text(
+                  'Mood\nTracker',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: FreudColors.richBrown,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          const _MoodTrackerFlow(),
+        ],
+      ),
     );
   }
 }
