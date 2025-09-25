@@ -18,9 +18,6 @@ class CustomizeAttributesScreen extends StatelessWidget {
         ? Get.find<UserController>()
         : Get.put(UserController());
 
-    final userController = Get.isRegistered<UserController>()
-        ? Get.find<UserController>()
-        : Get.put(UserController());
     return Scaffold(
       backgroundColor: FreudColors.cream,
       body: SafeArea(
@@ -205,7 +202,7 @@ class CustomizeAttributesScreen extends StatelessWidget {
                     if (saveDetails) {
                       Get.back<void>();
                     } else {
-                      Get.offAll(() => const HomeView());
+                      Get.offAllNamed(HomeView.routeName);
                     }
                   },
                   child: Text(saveDetails ? 'Save changes' : 'Continue'),

@@ -121,6 +121,7 @@ class _MindfulContent extends StatelessWidget {
               ),
               const Spacer(),
               _CircleIconButton(
+                
                 icon: Icons.bar_chart_rounded,
                 onPressed: () {
                   Navigator.of(context).pushNamed(

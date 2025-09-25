@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:ai_therapy/core/theme.dart';
 import 'package:ai_therapy/screens/auth/signup/signup_screen.dart';
 import 'package:ai_therapy/screens/auth/widgets/auth_components.dart';
-import 'package:ai_therapy/screens/dashboard/mental_health_dashboard_screen.dart';
+import 'package:ai_therapy/screens/onboarding/assessment/assessment_flow_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -206,7 +206,7 @@ class _SignInScreenState extends State<SignInScreen> {
     FocusScope.of(context).unfocus();
     if (_emailController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty) {
-      Get.offAllNamed(MentalHealthDashboardScreen.routeName);
+  Get.offAllNamed(AssessmentFlowScreen.routeName);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

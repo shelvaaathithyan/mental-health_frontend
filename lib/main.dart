@@ -9,16 +9,15 @@ import 'package:ai_therapy/screens/mindful_hours/mindful_hours_screen.dart';
 import 'package:ai_therapy/screens/mindful_hours/mindful_hours_stats_screen.dart';
 import 'package:ai_therapy/screens/onboarding/onboarding_screen.dart';
 import 'package:ai_therapy/screens/splash/splash_sequence_screen.dart';
+import 'package:ai_therapy/screens/therapy_chatbot/therapy_chatbot_screen.dart';
+import 'package:ai_therapy/screens/sleep_quality/sleep_quality_overview_screen.dart';
+
 import 'package:ai_therapy/screens/onboarding/assessment/assessment_flow_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'screens/dashboard/stats/stats_screen.dart';
-import 'screens/mindful_hours/mindful_hours_screen.dart';
-import 'screens/mindful_hours/mindful_hours_stats_screen.dart';
 import 'screens/sleep_quality/sleep_quality_history_screen.dart';
-import 'screens/sleep_quality/sleep_quality_overview_screen.dart';
 import 'screens/sleep_quality/sleep_quality_tips_screen.dart';
 
 //import math
@@ -66,6 +65,14 @@ class _MyAppState extends State<MyApp> {
           page: () => const OnboardingScreen(),
         ),
         GetPage(
+          name: SignInScreen.routeName,
+          page: () => const SignInScreen(),
+        ),
+        GetPage(
+          name: SignUpScreen.routeName,
+          page: () => const SignUpScreen(),
+        ),
+        GetPage(
           name: AssessmentFlowScreen.routeName,
           page: () => const AssessmentFlowScreen(),
         ),
@@ -88,6 +95,10 @@ class _MyAppState extends State<MyApp> {
         GetPage(
           name: MindfulHoursStatsScreen.routeName,
           page: () => const MindfulHoursStatsScreen(),
+        ),
+        GetPage(
+          name: TherapyChatbotScreen.routeName,
+          page: () => const TherapyChatbotScreen(),
         ),
         GetPage(
           name: SleepQualityOverviewScreen.routeName,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ai_therapy/core/theme.dart';
 import 'package:ai_therapy/screens/auth/widgets/auth_components.dart';
-import 'package:ai_therapy/screens/dashboard/mental_health_dashboard_screen.dart';
+import 'package:ai_therapy/screens/onboarding/assessment/assessment_flow_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -252,7 +252,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-    Get.offAllNamed(MentalHealthDashboardScreen.routeName);
+  Get.offAllNamed(AssessmentFlowScreen.routeName);
   }
 
   void _showSnackBar(String message) {
