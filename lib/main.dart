@@ -7,6 +7,7 @@ import 'package:ai_therapy/screens/dashboard/mental_health_dashboard_screen.dart
 import 'package:ai_therapy/screens/dashboard/stats/stats_screen.dart';
 import 'package:ai_therapy/screens/mindful_hours/mindful_hours_screen.dart';
 import 'package:ai_therapy/screens/mindful_hours/mindful_hours_stats_screen.dart';
+import 'package:ai_therapy/screens/mood_tracker/mood_tracker_screen.dart';
 import 'package:ai_therapy/screens/onboarding/onboarding_screen.dart';
 import 'package:ai_therapy/screens/splash/splash_sequence_screen.dart';
 import 'package:ai_therapy/screens/therapy_chatbot/therapy_chatbot_screen.dart';
@@ -100,6 +101,10 @@ class _MyAppState extends State<MyApp> {
         GetPage(
           name: MindfulHoursScreen.routeName,
           page: () => const MindfulHoursScreen(),
+        ),
+        GetPage(
+          name: MoodTrackerScreen.routeName,
+          page: () => const MoodTrackerScreen(),
         ),
         GetPage(
           name: MindfulHoursStatsScreen.routeName,

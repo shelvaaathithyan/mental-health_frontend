@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../core/theme.dart';
 import '../screens/dashboard/widgets/freud_bottom_navbar.dart';
 import '../screens/mindful_hours/mindful_hours_screen.dart';
+import '../screens/mood_tracker/mood_tracker_screen.dart';
 import '../screens/sleep_quality/sleep_quality_overview_screen.dart';
 import '../screens/therapy_chatbot/therapy_chatbot_screen.dart';
 
@@ -694,38 +695,42 @@ class _MoodTrackerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F1),
-        borderRadius: BorderRadius.circular(28),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _TrackerIconBadge(
-                icon: Icons.mood_rounded,
-                color: Color(0xFFB08B6C),
-              ),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Text(
-                  'Mood\nTracker',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: FreudColors.richBrown,
-                    height: 1.3,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Navigator.of(context).pushNamed(MoodTrackerScreen.routeName),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF8F1),
+          borderRadius: BorderRadius.circular(28),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _TrackerIconBadge(
+                  icon: Icons.mood_rounded,
+                  color: Color(0xFFB08B6C),
+                ),
+                const SizedBox(width: 18),
+                Expanded(
+                  child: Text(
+                    'Mood\nTracker',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: FreudColors.richBrown,
+                      height: 1.3,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          const _MoodTrackerFlow(),
-        ],
+              ],
+            ),
+            const SizedBox(height: 18),
+            const _MoodTrackerFlow(),
+          ],
+        ),
       ),
     );
   }
@@ -768,120 +773,177 @@ class _ChatbotSection extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(24, 28, 24, 54),
-            decoration: BoxDecoration(
-              color: const Color(0xFFBDB3AA),
-              borderRadius: BorderRadius.circular(32),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < 360;
+          final rawWidth = constraints.maxWidth * (isCompact ? 0.48 : 0.32);
+          final robotWidth = rawWidth.clamp(80.0, 120.0).toDouble();
+          final robotHeight = robotWidth * 1.25;
+
+          final statsContent = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'AI Therapy Chatbot',
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        color: FreudColors.textLight,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.settings,
+                      color: FreudColors.textLight,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '2,541',
+                style: theme.textTheme.displayLarge?.copyWith(
+                  color: FreudColors.textLight,
+                  fontSize: 40,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(Icons.messenger_outline,
+                      color: FreudColors.textLight, size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    '83 left this month',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: FreudColors.textLight.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(Icons.workspace_premium_outlined,
+                      color: FreudColors.textLight, size: 18),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Go Pro, now!',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: FreudColors.textLight,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+
+          final robotImage = SizedBox(
+            width: robotWidth,
+            height: robotHeight,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Image.asset(
+                'assets/robot.png',
+                fit: BoxFit.cover,
+              ),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          );
+
+          final content = isCompact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    statsContent,
+                    const SizedBox(height: 20),
+                    Align(alignment: Alignment.center, child: robotImage),
+                  ],
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: statsContent),
+                    const SizedBox(width: 16),
+                    Flexible(
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: robotImage,
+                      ),
+                    ),
+                  ],
+                );
+
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 54),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFBDB3AA),
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                child: content,
+              ),
+              if (isCompact)
+                const Positioned(
+                  bottom: -26,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            'AI Therapy Chatbot',
-                            style: theme.textTheme.displaySmall?.copyWith(
-                              color: FreudColors.textLight,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const Spacer(),
-                          Container(
-                            width: 34,
-                            height: 34,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.15),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.settings,
-                              color: FreudColors.textLight,
-                              size: 18,
-                            ),
-                          ),
-                        ],
+                      _ChatbotActionButton(
+                        color: FreudColors.mossGreen,
+                        icon: Icons.add,
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        '2,541',
-                        style: theme.textTheme.displayLarge?.copyWith(
-                          color: FreudColors.textLight,
-                          fontSize: 40,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.messenger_outline,
-                              color: FreudColors.textLight, size: 18),
-                          const SizedBox(width: 8),
-                          Text(
-                            '83 left this month',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: FreudColors.textLight.withValues(alpha: 0.8),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.workspace_premium_outlined,
-                              color: FreudColors.textLight, size: 18),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Go Pro, now!',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: FreudColors.textLight,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
+                      SizedBox(width: 32),
+                      _ChatbotActionButton(
+                        color: FreudColors.burntOrange,
+                        icon: Icons.settings_applications_rounded,
                       ),
                     ],
                   ),
+                )
+              else ...const [
+                Positioned(
+                  bottom: -26,
+                  left: 32,
+                  child: _ChatbotActionButton(
+                    color: FreudColors.mossGreen,
+                    icon: Icons.add,
+                  ),
                 ),
-                const SizedBox(width: 16),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: Image.asset(
-                    'assets/robot.png',
-                    width: 96,
-                    height: 120,
-                    fit: BoxFit.cover,
+                Positioned(
+                  bottom: -26,
+                  left: 104,
+                  child: _ChatbotActionButton(
+                    color: FreudColors.burntOrange,
+                    icon: Icons.settings_applications_rounded,
                   ),
                 ),
               ],
-            ),
-          ),
-          const Positioned(
-            bottom: -26,
-            left: 32,
-            child: _ChatbotActionButton(
-              color: FreudColors.mossGreen,
-              icon: Icons.add,
-            ),
-          ),
-          const Positioned(
-            bottom: -26,
-            left: 104,
-            child: _ChatbotActionButton(
-              color: FreudColors.burntOrange,
-              icon: Icons.settings_applications_rounded,
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
