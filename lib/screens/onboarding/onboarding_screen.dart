@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../Widgets/custom_button.dart';
 import '../../core/theme.dart';
+import 'assessment/assessment_flow_screen.dart';
 import '../auth/signin/signin_screen.dart';
 import '../dashboard/mental_health_dashboard_screen.dart';
 
@@ -106,6 +107,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 CustomButton(
                   text: 'Start with Emma',
                   onPressed: () {
+                    Navigator.of(context)
+                        .pushReplacementNamed(AssessmentFlowScreen.routeName);
                     Get.toNamed(SignInScreen.routeName);
                   },
                 ).animate(delay: 350.ms).fadeIn(duration: 500.ms),
