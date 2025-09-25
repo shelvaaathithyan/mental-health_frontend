@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:ai_therapy/Controllers/auth_controller.dart';
 import 'package:ai_therapy/core/theme.dart';
 import 'package:ai_therapy/screens/auth/signup/signup_screen.dart';
 import 'package:ai_therapy/screens/auth/widgets/auth_components.dart';
 import 'package:ai_therapy/screens/onboarding/assessment/assessment_flow_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -18,6 +19,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+  final AuthController _authController = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -102,33 +104,48 @@ class _SignInScreenState extends State<SignInScreen> {
                   focusedBorderColor: FreudColors.richBrown,
                 ),
                 const SizedBox(height: 28),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _handleSignIn,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: FreudColors.richBrown,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                Obx(
+                  () {
+                    final isLoading = _authController.isLoading.value;
+                    return SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : _handleSignIn,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: FreudColors.richBrown,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
                           ),
                         ),
-                        SizedBox(width: 10),
-                        Icon(Icons.arrow_forward_rounded, size: 20),
-                      ],
-                    ),
-                  ),
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.4,
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Sign In',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Icon(Icons.arrow_forward_rounded, size: 20),
+                                ],
+                              ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 28),
                 Center(
@@ -202,16 +219,31 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  void _handleSignIn() {
+  Future<void> _handleSignIn() async {
     FocusScope.of(context).unfocus();
-    if (_emailController.text.isNotEmpty &&
-        _passwordController.text.isNotEmpty) {
-  Get.offAllNamed(AssessmentFlowScreen.routeName);
-    } else {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in all fields'),
           backgroundColor: Color(0xFFF47C2A),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _authController.login(email: email, password: password);
+      if (!mounted) return;
+      Get.offAllNamed(AssessmentFlowScreen.routeName);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString()),
+          backgroundColor: FreudColors.cocoa,
         ),
       );
     }

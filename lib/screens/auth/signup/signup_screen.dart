@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:ai_therapy/Controllers/auth_controller.dart';
 import 'package:ai_therapy/core/theme.dart';
 import 'package:ai_therapy/screens/auth/widgets/auth_components.dart';
 import 'package:ai_therapy/screens/onboarding/assessment/assessment_flow_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -20,6 +21,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _showEmailError = false;
+  final AuthController _authController = Get.find<AuthController>();
 
   // Email validation
   bool _isValidEmail(String email) {
@@ -166,33 +168,48 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   borderColor: FreudColors.textDark.withValues(alpha: 0.08),
                 ),
                 const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _handleSignUp,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: FreudColors.richBrown,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                Obx(
+                  () {
+                    final isLoading = _authController.isLoading.value;
+                    return SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : _handleSignUp,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: FreudColors.richBrown,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
                           ),
                         ),
-                        SizedBox(width: 10),
-                        Icon(Icons.arrow_forward_rounded, size: 20),
-                      ],
-                    ),
-                  ),
+                        child: isLoading
+                            ? const SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.4,
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Sign Up',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Icon(Icons.arrow_forward_rounded, size: 20),
+                                ],
+                              ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 28),
                 Row(
@@ -227,7 +244,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  void _handleSignUp() {
+  Future<void> _handleSignUp() async {
     FocusScope.of(context).unfocus();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -252,7 +269,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-  Get.offAllNamed(AssessmentFlowScreen.routeName);
+    try {
+      await _authController.register(email: email, password: password);
+      if (!mounted) return;
+      Get.offAllNamed(AssessmentFlowScreen.routeName);
+    } catch (error) {
+      if (!mounted) return;
+      _showSnackBar(error.toString());
+    }
   }
 
   void _showSnackBar(String message) {

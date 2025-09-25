@@ -1,3 +1,4 @@
+import 'package:ai_therapy/Controllers/auth_controller.dart';
 import 'package:ai_therapy/Controllers/user_controller.dart';
 import 'package:ai_therapy/View/home_view.dart';
 import 'package:ai_therapy/core/theme.dart';
@@ -40,6 +41,7 @@ void main() async {
   await GetStorage.init();
   await dotenv.load(fileName: ".env");
   Get.put(UserController(), permanent: true);
+  Get.put(AuthController(), permanent: true);
   runApp(const MyApp());
 }
 
