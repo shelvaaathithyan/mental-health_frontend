@@ -13,6 +13,13 @@ import 'screens/mindful_hours/mindful_hours_stats_screen.dart';
 import 'screens/sleep_quality/sleep_quality_history_screen.dart';
 import 'screens/sleep_quality/sleep_quality_overview_screen.dart';
 import 'screens/sleep_quality/sleep_quality_tips_screen.dart';
+import 'screens/journal/journal_overview_screen.dart';
+import 'screens/journal/journal_stats_screen.dart';
+import 'screens/journal/journal_new_screen.dart';
+import 'screens/journal/journal_voice_screen.dart';
+import 'screens/journal/journal_text_screen.dart';
+import 'screens/journal/journal_detail_screen.dart';
+import 'Controllers/journal_controller.dart';
 
 //import math
 
@@ -47,6 +54,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure controllers are registered early
+    Get.put(JournalController(), permanent: true);
     return GetMaterialApp(
       title: 'Emma',
       debugShowCheckedModeBanner: false,
@@ -89,6 +98,12 @@ class _MyAppState extends State<MyApp> {
           name: SleepQualityTipsScreen.routeName,
           page: () => const SleepQualityTipsScreen(),
         ),
+        GetPage(name: JournalOverviewScreen.routeName, page: () => const JournalOverviewScreen()),
+        GetPage(name: JournalStatsScreen.routeName, page: () => const JournalStatsScreen()),
+        GetPage(name: JournalNewScreen.routeName, page: () => const JournalNewScreen()),
+        GetPage(name: JournalVoiceScreen.routeName, page: () => const JournalVoiceScreen()),
+        GetPage(name: JournalTextScreen.routeName, page: () => const JournalTextScreen()),
+        GetPage(name: JournalDetailScreen.routeName, page: () => const JournalDetailScreen()),
       ],
     );
   }

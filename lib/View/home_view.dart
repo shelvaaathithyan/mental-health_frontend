@@ -296,13 +296,16 @@ class _MindfulTrackerSection extends StatelessWidget {
                 .pushNamed(SleepQualityOverviewScreen.routeName),
           ),
           const SizedBox(height: _cardSpacing),
-          const _TrackerCard(
-            background: Color(0xFFFDEBE0),
+          _TrackerCard(
+            background: const Color(0xFFFDEBE0),
             iconColor: FreudColors.burntOrange,
             icon: Icons.menu_book_rounded,
             title: 'Mindful Journal',
             subtitle: '64 Day Streak',
-            trailing: _JournalHeatmap(),
+            trailing: const _JournalHeatmap(),
+            onTap: () => Navigator.of(context).pushNamed(
+              '/journal/overview',
+            ),
           ),
           const SizedBox(height: _cardSpacing),
           const _TrackerCard(
