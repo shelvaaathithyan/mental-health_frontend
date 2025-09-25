@@ -34,68 +34,8 @@ class SleepQualityOverviewScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _SleepSummaryCard(),
-            const SizedBox(height: 24),
-            Text(
-              'Tonight\'s Breakdown',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: FreudColors.richBrown,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Row(
-              children: [
-                Expanded(
-                  child: _SleepMetricTile(
-                    label: 'Total Sleep',
-                    value: '5h 12m',
-                    deltaLabel: '+32m vs Avg',
-                    icon: Icons.nightlight_round,
-                    background: Color(0xFFE8E3FF),
-                    iconColor: Color(0xFF6C5BD4),
-                  ),
-                ),
-                SizedBox(width: 14),
-                Expanded(
-                  child: _SleepMetricTile(
-                    label: 'Deep Sleep',
-                    value: '1h 05m',
-                    deltaLabel: '-12m vs Avg',
-                    icon: Icons.bedtime_rounded,
-                    background: Color(0xFFD5F3EA),
-                    iconColor: Color(0xFF3E8D75),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            const Row(
-              children: [
-                Expanded(
-                  child: _SleepMetricTile(
-                    label: 'REM Cycle',
-                    value: '48%',
-                    deltaLabel: '+5% vs Avg',
-                    icon: Icons.bubble_chart_rounded,
-                    background: Color(0xFFFDEBE0),
-                    iconColor: FreudColors.burntOrange,
-                  ),
-                ),
-                SizedBox(width: 14),
-                Expanded(
-                  child: _SleepMetricTile(
-                    label: 'Sleep Latency',
-                    value: '18m',
-                    deltaLabel: 'Fell asleep faster',
-                    icon: Icons.timelapse_rounded,
-                    background: Color(0xFFFFF3DF),
-                    iconColor: Color(0xFFE4A03E),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 28),
+            const _SleepHighlightStrip(),
+            const SizedBox(height: 32),
             Text(
               'Sleep Stages',
               style: theme.textTheme.titleMedium?.copyWith(
@@ -160,175 +100,91 @@ class SleepQualityOverviewScreen extends StatelessWidget {
   }
 }
 
-class _SleepSummaryCard extends StatelessWidget {
-  const _SleepSummaryCard();
+class _SleepHighlightStrip extends StatelessWidget {
+  const _SleepHighlightStrip();
+
+  static const _highlights = [
+    _HighlightData(
+      title: '+5% vs Avg',
+      subtitle: 'Deep Sleep quality',
+      background: Color(0xFFF0E7FF),
+    ),
+    _HighlightData(
+      title: 'Fell asleep faster',
+      subtitle: 'Sleep latency down',
+      background: Color(0xFFFFF1DD),
+    ),
+    _HighlightData(
+      title: 'Settled heart rate',
+      subtitle: 'Fewer wake-ups',
+      background: Color(0xFFE8F5ED),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF5D3FD3), Color(0xFF8D6CF5)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(36),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF5D3FD3).withValues(alpha: 0.2),
-            blurRadius: 32,
-            offset: const Offset(0, 18),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Emma Score',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: FreudColors.textLight.withValues(alpha: 0.72),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '62',
-                      style: theme.textTheme.displayMedium?.copyWith(
-                        color: FreudColors.textLight,
-                        fontSize: 46,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Restless',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: FreudColors.textLight,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 78,
-                height: 78,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.16),
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: const Icon(
-                  Icons.health_and_safety_rounded,
-                  color: Colors.white,
-                  size: 36,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(28),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.lightbulb_rounded,
-                    color: Colors.white, size: 24),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Text(
-                    'Your last REM cycle was shortened. Keep consistent lights-out by 11 PM to improve recovery.',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: FreudColors.textLight,
-                      height: 1.42,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: _highlights
+          .map((data) => _SleepHighlightChip(data: data))
+          .toList(growable: false),
     );
   }
 }
 
-class _SleepMetricTile extends StatelessWidget {
-  const _SleepMetricTile({
-    required this.label,
-    required this.value,
-    required this.deltaLabel,
-    required this.icon,
-    required this.background,
-    required this.iconColor,
-  });
+class _SleepHighlightChip extends StatelessWidget {
+  const _SleepHighlightChip({required this.data});
 
-  final String label;
-  final String value;
-  final String deltaLabel;
-  final IconData icon;
-  final Color background;
-  final Color iconColor;
+  final _HighlightData data;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(20),
+    final theme = Theme.of(context).textTheme;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 160, maxWidth: 220),
+      child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(28),
+        color: data.background,
+        borderRadius: BorderRadius.circular(26),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, color: iconColor, size: 22),
-          ),
-          const SizedBox(height: 16),
           Text(
-            value,
-            style: theme.textTheme.displaySmall?.copyWith(
+            data.title,
+            style: theme.titleSmall?.copyWith(
               color: FreudColors.richBrown,
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
           Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: FreudColors.richBrown.withValues(alpha: 0.7),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            deltaLabel,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: FreudColors.richBrown.withValues(alpha: 0.55),
+            data.subtitle,
+            style: theme.bodySmall?.copyWith(
+              color: FreudColors.richBrown.withValues(alpha: 0.65),
+              height: 1.3,
             ),
           ),
         ],
       ),
+      ),
     );
   }
+}
+
+class _HighlightData {
+  const _HighlightData({
+    required this.title,
+    required this.subtitle,
+    required this.background,
+  });
+
+  final String title;
+  final String subtitle;
+  final Color background;
 }
 
 class _SleepStagesChart extends StatelessWidget {
@@ -338,15 +194,15 @@ class _SleepStagesChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.fromLTRB(22, 24, 22, 28),
+      padding: const EdgeInsets.fromLTRB(22, 26, 22, 32),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFFF6F1FF),
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: FreudColors.richBrown.withValues(alpha: 0.08),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
+            color: FreudColors.richBrown.withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 14),
           ),
         ],
       ),
@@ -468,27 +324,36 @@ class _StageBarSegment extends StatelessWidget {
           children: [
             Expanded(
               child: Row(
-                children: segments
-                    .map(
-                      (segment) => Expanded(
-                        flex: (segment.widthFactor * 1000).toInt(),
+                children: [
+                  for (var i = 0; i < segments.length; i++) ...[
+                    Expanded(
+                      flex: (segments[i].widthFactor * 1000).round(),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.horizontal(
+                          left: i == 0
+                              ? const Radius.circular(999)
+                              : Radius.zero,
+                          right: i == segments.length - 1
+                              ? const Radius.circular(999)
+                              : Radius.zero,
+                        ),
                         child: Container(
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: segment.color,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          height: 18,
+                          color: segments[i].color,
                         ),
                       ),
-                    )
-                    .toList(),
+                    ),
+                    if (i != segments.length - 1)
+                      const SizedBox(width: 6),
+                  ]
+                ],
               ),
             ),
             const SizedBox(width: 12),
             Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: FreudColors.richBrown.withValues(alpha: 0.6),
+                    color: FreudColors.richBrown.withValues(alpha: 0.65),
                   ),
             ),
           ],
@@ -602,12 +467,17 @@ class _PrimaryButton extends StatelessWidget {
           children: [
             Icon(icon, color: FreudColors.textLight, size: 20),
             const SizedBox(width: 10),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: FreudColors.textLight,
-                    fontWeight: FontWeight.w700,
-                  ),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: FreudColors.textLight,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
             ),
           ],
         ),
@@ -646,12 +516,17 @@ class _SecondaryButton extends StatelessWidget {
           children: [
             Icon(icon, color: FreudColors.richBrown, size: 20),
             const SizedBox(width: 10),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: FreudColors.richBrown,
-                    fontWeight: FontWeight.w700,
-                  ),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: FreudColors.richBrown,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
             ),
           ],
         ),

@@ -10,8 +10,8 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class ChatController extends GetxController {
-  static const primaryModel = 'gemini-1.5-flash-latest';
-  static const fallbackModel = 'gemini-1.5-pro-latest';
+  static const primaryModel = 'gemini-2.0-flash';
+  static const fallbackModel = 'gemini-2.0-flash';
 
   SpeechToText speechToText = SpeechToText();
   late final AudioPlayer _audioPlayer;
