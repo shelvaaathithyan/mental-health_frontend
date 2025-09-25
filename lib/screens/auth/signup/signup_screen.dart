@@ -72,7 +72,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Create your account and unlock daily support from Emma.',
+                        'Create your account and unlock daily support from Neptune.',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: FreudColors.textDark.withValues(alpha: 0.55),
                         ),

@@ -1,8 +1,8 @@
-freud.ai Splash & Loading System
+Neptune.ai Splash & Loading System
 ================================
 
 The new launch flow recreates the four-step splash/loading narrative from the
-freud.ai concept art. The visual language is earthy, warm, and minimal. This
+Neptune.ai concept art. The visual language is earthy, warm, and minimal. This
 document captures the palette, typography, and layout principles backing the
 implementation in `lib/core/theme.dart` and
 `lib/screens/splash/splash_sequence_screen.dart`.
@@ -53,7 +53,7 @@ Typography is encoded via `FreudTypography.build()` so widgets can reuse
 ---------------------------
 
 1. **Brand Splash** (cream)
-   - Center the 5-dot clover mark above the wordmark `freud.ai`.
+  - Center the 5-dot clover mark above the wordmark `Neptune.ai`.
    - Text color: `textDark`.
 
 2. **Loading** (rich brown)
@@ -77,7 +77,7 @@ Typography is encoded via `FreudTypography.build()` so widgets can reuse
 - `FreudTheme.light()` maps colors into the Material color scheme so general UI
   components stay brand-aligned without extra styling.
 - `_LogoMark` builds the four-petal icon using concentric circles; reuse on any
-  screen that needs the freud.ai mark.
+  screen that needs the Neptune.ai mark.
 - `_BackgroundCircle` helper manages the translucent overlays for loader and
   fetching states.
 - Splash sequence timing: 1.6s → 2.2s → 2.4s transitions, then 1.8s hold before

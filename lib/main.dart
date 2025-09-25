@@ -70,7 +70,7 @@ class _MyAppState extends State<MyApp> {
     // Ensure controllers are registered early
     Get.put(JournalController(), permanent: true);
     return GetMaterialApp(
-      title: 'Emma',
+      title: 'Neptune',
       debugShowCheckedModeBanner: false,
       theme: FreudTheme.light(),
       home: SplashSequenceScreen(isFirstTime: firstTime),

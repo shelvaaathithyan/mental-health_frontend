@@ -1,4 +1,4 @@
-Here’s how you move from **just a landing + voice page** → to a full **Emma UI prototype** following your rules. Think in **steps** not all-at-once code dump.
+Here’s how you move from **just a landing + voice page** → to a full **Neptune UI prototype** following your rules. Think in **steps** not all-at-once code dump.
 
 ---
 
@@ -64,7 +64,7 @@ Purpose: Set tone, explain trust and confidentiality, make user comfortable.
 
 Content:
 
-App name + calming tagline (“Emma – here for you, always confidential”).
+App name + calming tagline (“Neptune – here for you, always confidential”).
 
 Short intro text (1–2 lines, culturally sensitive).
 

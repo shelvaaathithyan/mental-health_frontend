@@ -68,7 +68,7 @@ class CustomizeAttributesScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Let's tailor Emma to you",
+                      "Let's tailor Neptune to you",
                       style: textTheme.displayMedium?.copyWith(
                         fontSize: 30,
                         fontWeight: FontWeight.w700,
@@ -78,7 +78,7 @@ class CustomizeAttributesScreen extends StatelessWidget {
                     Text(
                       saveDetails
                           ? 'Fine-tune how sessions feel so they stay aligned with your current needs.'
-                          : "Adjust Emma's tone and approach so our sessions match what you're looking for.",
+                          : "Adjust Neptune's tone and approach so our sessions match what you're looking for.",
                       style: textTheme.bodyMedium?.copyWith(
                         color: FreudColors.textDark.withValues(alpha: 0.72),
                       ),

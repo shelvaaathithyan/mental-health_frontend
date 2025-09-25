@@ -1,6 +1,6 @@
-# Dr. Emma
+# Neptune
 
-Dr. Emma is an AI-assisted mental health companion that combines CBT/DBT style prompts with voice input/output. The Flutter app listens to the user, sends conversation history to Google Gemini, and replies with natural speech.
+Neptune is an AI-assisted mental health companion that combines CBT/DBT style prompts with voice input/output. The Flutter app listens to the user, sends conversation history to Google Gemini, and replies with natural speech.
 
 ## Prerequisites
 
