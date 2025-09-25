@@ -11,6 +11,7 @@ class FreudColors {
   static const Color burntOrange = Color(0xFFF57C1F);
   static const Color mossGreen = Color(0xFF6C8A3C);
   static const Color paleOlive = Color(0xFFC4D88F);
+  static const Color sunshine = Color(0xFFFFC85B);
   static const Color textDark = Color(0xFF2F1D12);
   static const Color textLight = Color(0xFFFDF7EF);
   static const Color error = Color(0xFFD64545);

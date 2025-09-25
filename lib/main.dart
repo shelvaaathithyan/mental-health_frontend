@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'screens/dashboard/stats/stats_screen.dart';
+import 'screens/mindful_hours/mindful_hours_screen.dart';
+import 'screens/mindful_hours/mindful_hours_stats_screen.dart';
 
 //import math
 
@@ -53,6 +56,18 @@ class _MyAppState extends State<MyApp> {
         GetPage(
           name: HomeView.routeName,
           page: () => const HomeView(),
+        ),
+        GetPage(
+          name: StatsScreen.routeName,
+          page: () => const StatsScreen(),
+        ),
+        GetPage(
+          name: MindfulHoursScreen.routeName,
+          page: () => const MindfulHoursScreen(),
+        ),
+        GetPage(
+          name: MindfulHoursStatsScreen.routeName,
+          page: () => const MindfulHoursStatsScreen(),
         ),
       ],
     );
