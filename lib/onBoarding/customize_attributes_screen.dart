@@ -13,9 +13,9 @@ class CustomizeAttributesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final userController = Get.isRegistered<UserController>()
-    ? Get.find<UserController>()
-    : Get.put(UserController());
+    final userController = Get.isRegistered<UserController>()
+        ? Get.find<UserController>()
+        : Get.put(UserController());
     return Scaffold(
       // appBar: AppBar(),
       body: CustomBackground(
