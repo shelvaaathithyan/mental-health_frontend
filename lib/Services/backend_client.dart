@@ -23,12 +23,29 @@ class BackendClient {
     if (envUrl != null && envUrl.isNotEmpty) {
       return envUrl;
     }
-    return 'http://localhost:8000';
+
+    if (kIsWeb) {
+      // Browser requests can talk to a local FastAPI dev server on localhost.
+      return 'http://localhost:8000';
+    }
+
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        // Android emulators map the host machine's localhost to 10.0.2.2.
+        return 'http://10.0.2.2:8000';
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+      case TargetPlatform.windows:
+      case TargetPlatform.linux:
+      case TargetPlatform.fuchsia:
+        return 'http://127.0.0.1:8000';
+    }
   }
 
   Future<http.Response> post(
     String path, {
     Map<String, dynamic>? body,
+    Map<String, dynamic>? queryParameters,
     bool requiresAuth = true,
     Map<String, String>? headers,
     RequestBodyType bodyType = RequestBodyType.json,
@@ -37,6 +54,7 @@ class BackendClient {
       'POST',
       path,
       body: body,
+      queryParameters: queryParameters,
       requiresAuth: requiresAuth,
       headers: headers,
       bodyType: bodyType,
@@ -45,12 +63,48 @@ class BackendClient {
 
   Future<http.Response> get(
     String path, {
+    Map<String, dynamic>? queryParameters,
     bool requiresAuth = true,
     Map<String, String>? headers,
   }) {
     return _send(
       'GET',
       path,
+      queryParameters: queryParameters,
+      requiresAuth: requiresAuth,
+      headers: headers,
+    );
+  }
+
+  Future<http.Response> patch(
+    String path, {
+    Map<String, dynamic>? body,
+    Map<String, dynamic>? queryParameters,
+    bool requiresAuth = true,
+    Map<String, String>? headers,
+    RequestBodyType bodyType = RequestBodyType.json,
+  }) {
+    return _send(
+      'PATCH',
+      path,
+      body: body,
+      queryParameters: queryParameters,
+      requiresAuth: requiresAuth,
+      headers: headers,
+      bodyType: bodyType,
+    );
+  }
+
+  Future<http.Response> delete(
+    String path, {
+      Map<String, dynamic>? queryParameters,
+      bool requiresAuth = true,
+      Map<String, String>? headers,
+    }) {
+    return _send(
+      'DELETE',
+      path,
+      queryParameters: queryParameters,
       requiresAuth: requiresAuth,
       headers: headers,
     );
@@ -122,11 +176,12 @@ class BackendClient {
     String method,
     String path, {
     Map<String, dynamic>? body,
+    Map<String, dynamic>? queryParameters,
     bool requiresAuth = true,
     Map<String, String>? headers,
     RequestBodyType bodyType = RequestBodyType.json,
   }) async {
-    final uri = Uri.parse('$baseUrl$path');
+    final uri = _buildUri(path, queryParameters);
     final effectiveHeaders = <String, String>{
       'Accept': 'application/json',
       if (headers != null) ...headers,
@@ -176,6 +231,16 @@ class BackendClient {
             .get(uri, headers: effectiveHeaders)
             .timeout(const Duration(seconds: 15));
         break;
+      case 'PATCH':
+        response = await _client
+            .patch(uri, headers: effectiveHeaders, body: encodedBody)
+            .timeout(const Duration(seconds: 15));
+        break;
+      case 'DELETE':
+        response = await _client
+            .delete(uri, headers: effectiveHeaders)
+            .timeout(const Duration(seconds: 15));
+        break;
       default:
         throw UnsupportedError('HTTP method not supported: $method');
     }
@@ -196,5 +261,41 @@ class BackendClient {
 
   void dispose() {
     _client.close();
+  }
+
+  Uri _buildUri(String path, Map<String, dynamic>? queryParameters) {
+    final baseUri = Uri.parse('$baseUrl$path');
+    if (queryParameters == null || queryParameters.isEmpty) {
+      return baseUri;
+    }
+
+    final buffer = StringBuffer();
+    if (baseUri.hasQuery) {
+      buffer.write(baseUri.query);
+    }
+
+    void appendPair(String key, String value) {
+      if (buffer.isNotEmpty) {
+        buffer.write('&');
+      }
+      buffer
+        ..write(Uri.encodeQueryComponent(key))
+        ..write('=')
+        ..write(Uri.encodeQueryComponent(value));
+    }
+
+    queryParameters.forEach((key, value) {
+      if (value == null) return;
+      if (value is Iterable) {
+        for (final element in value) {
+          if (element == null) continue;
+          appendPair(key, element.toString());
+        }
+      } else {
+        appendPair(key, value.toString());
+      }
+    });
+
+    return baseUri.replace(query: buffer.toString());
   }
 }

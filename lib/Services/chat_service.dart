@@ -28,6 +28,8 @@ class ChatService {
         }
       }
 
+      bool firstDataSkipped = false;
+
       await for (final chunk in _client.postStream(
         '/chat',
         body: request.toJson(),
@@ -46,6 +48,10 @@ class ChatService {
               yield StreamingChatResponse(content: '', isDone: true);
               return;
             } else if (data.isNotEmpty) {
+              if (!firstDataSkipped) {
+                firstDataSkipped = true;
+                continue; // Skip the first data chunk (thread_id)
+              }
               if (kDebugMode) {
                 debugPrint('ChatService ← Chunk: $data');
               }

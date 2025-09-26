@@ -6,7 +6,6 @@ import 'package:ai_therapy/Services/chat_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -210,8 +209,8 @@ When a user seeks advice on handling emotional distress, the model should provid
     }
   }
 
-  void _handleSpeechError(SpeechRecognitionError error) {
-    debugPrint('Speech error: ${error.errorMsg}');
+  void _handleSpeechError(dynamic error) {
+    debugPrint('Speech error: $error');
   }
 
   Timer? noSpeechTimer;
@@ -267,8 +266,10 @@ When a user seeks advice on handling emotional distress, the model should provid
 
       if (speechToText.isListening) {
         await speechToText.stop();
+        await Future.delayed(const Duration(milliseconds: 100));
       }
       await speechToText.cancel();
+      await Future.delayed(const Duration(milliseconds: 100));
 
       noSpeechTimer?.cancel();
       isListeningDone.value = false;
@@ -357,46 +358,6 @@ When a user seeks advice on handling emotional distress, the model should provid
       isListening.value = false;
       _requestBackendResponse();
     }
-  }
-
-  // Old Gemini API method - replaced with backend streaming
-  // This method is no longer used and can be removed in future cleanup
-  Future<String?> _requestGeminiResponse() async {
-  if (processing.value) return null;
-    processing.value = true;
-    String? responseText;
-    try {
-      final message = await _apiService.getChatCompletion(
-        model: primaryModel,
-        prompt: lastWords.value,
-        basePrompt: basePrompt,
-      );
-
-      if (message != null) {
-        aiResp.value = message;
-        responseText = message;
-      }
-    } catch (error) {
-      try {
-        final message = await _apiService.getChatCompletion(
-          model: fallbackModel,
-          prompt: lastWords.value,
-          basePrompt: basePrompt,
-        );
-
-        if (message != null) {
-          aiResp.value = message;
-          responseText = message;
-        }
-      } catch (secondaryError) {
-        aiResp.value = 'I ran into an issue responding. Let’s try again.';
-        responseText = aiResp.value;
-        debugPrint('Gemini request failed: $secondaryError');
-      }
-    } finally {
-      processing.value = false;
-    }
-    return responseText;
   }
 
   Future<String?> sendTextPrompt(String prompt) async {

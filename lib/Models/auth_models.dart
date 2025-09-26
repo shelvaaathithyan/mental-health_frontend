@@ -13,6 +13,33 @@ class AuthUser {
   final bool isGuest;
   final DateTime createdAt;
 
+  String get displayName {
+    final localPart = email.split('@').first.trim();
+    if (localPart.isEmpty) {
+      return '';
+    }
+    final segments = localPart
+        .split(RegExp(r'[._-]+'))
+        .where((segment) => segment.isNotEmpty);
+    if (segments.isEmpty) {
+      return _capitalize(localPart);
+    }
+    final formatted = segments.map(_capitalize).join(' ').trim();
+    return formatted.isEmpty ? _capitalize(localPart) : formatted;
+  }
+
+  static String _capitalize(String value) {
+    if (value.isEmpty) {
+      return value;
+    }
+    if (value.length == 1) {
+      return value.toUpperCase();
+    }
+    final first = value[0].toUpperCase();
+    final rest = value.substring(1).toLowerCase();
+    return '$first$rest';
+  }
+
   factory AuthUser.fromJson(Map<String, dynamic> json) {
     return AuthUser(
       id: json['id'] as int,
@@ -50,8 +77,8 @@ class AuthResponse {
     return AuthResponse(
       accessToken: json['access_token'] as String,
       tokenType: json['token_type'] as String? ?? 'bearer',
-      expiresAt:
-          DateTime.tryParse(json['expires_at'] as String? ?? '') ?? DateTime.now(),
+      expiresAt: DateTime.tryParse(json['expires_at'] as String? ?? '') ??
+          DateTime.now(),
       user: AuthUser.fromJson(json['user'] as Map<String, dynamic>),
     );
   }
@@ -79,5 +106,6 @@ class AuthException implements Exception {
   final int? statusCode;
 
   @override
-  String toString() => 'AuthException(statusCode: $statusCode, message: $message)';
+  String toString() =>
+      'AuthException(statusCode: $statusCode, message: $message)';
 }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../Controllers/auth_controller.dart';
 import '../core/theme.dart';
 import '../screens/dashboard/widgets/freud_bottom_navbar.dart';
 import '../screens/mindful_hours/mindful_hours_screen.dart';
 import '../screens/sleep_quality/sleep_quality_overview_screen.dart';
 import '../screens/therapy_chatbot/therapy_chatbot_screen.dart';
 import '../screens/journal/journal_new_screen.dart';
+import '../screens/journal/journal_overview_screen.dart';
 import '../screens/mood_tracker/mood_tracker_screen.dart';
 
 class HomeView extends StatefulWidget {
@@ -31,9 +33,11 @@ class _HomeViewState extends State<HomeView> {
         child: FreudBottomNavbar(
           items: const [
             FreudBottomNavItem(icon: Icons.home_rounded, label: 'Home'),
-            FreudBottomNavItem(icon: Icons.chat_bubble_outline_rounded, label: 'Chat'),
+            FreudBottomNavItem(
+                icon: Icons.chat_bubble_outline_rounded, label: 'Chat'),
             FreudBottomNavItem(icon: Icons.bar_chart_rounded, label: 'Stats'),
-            FreudBottomNavItem(icon: Icons.person_outline_rounded, label: 'Profile'),
+            FreudBottomNavItem(
+                icon: Icons.person_outline_rounded, label: 'Profile'),
           ],
           currentIndex: _navIndex,
           onItemSelected: (index) {
@@ -89,6 +93,7 @@ class _HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final authController = Get.find<AuthController>();
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
@@ -151,13 +156,19 @@ class _HomeHeader extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Hi, Shinomiya!',
-                      style: theme.textTheme.displayMedium?.copyWith(
-                        color: FreudColors.textLight,
-                        fontSize: 26,
-                      ),
-                    ),
+                    Obx(() {
+                      final user = authController.currentUser.value;
+                      final name = user?.displayName ?? '';
+                      final greeting =
+                          name.trim().isEmpty ? 'Hi there!' : 'Hi, $name!';
+                      return Text(
+                        greeting,
+                        style: theme.textTheme.displayMedium?.copyWith(
+                          color: FreudColors.textLight,
+                          fontSize: 26,
+                        ),
+                      );
+                    }),
                     const SizedBox(height: 8),
                     const Wrap(
                       spacing: 8,
@@ -192,6 +203,7 @@ class _HomeHeader extends StatelessWidget {
     );
   }
 }
+
 class _MoodChip extends StatelessWidget {
   const _MoodChip({
     required this.label,
@@ -355,7 +367,7 @@ class _MindfulTrackerSection extends StatelessWidget {
             title: 'Mindful Journal',
             subtitle: '64 Day Streak',
             trailing: const _JournalHeatmap(),
-            onTap: () => Get.toNamed(JournalNewScreen.routeName),
+            onTap: () => Get.toNamed(JournalOverviewScreen.routeName),
           ),
           const SizedBox(height: _cardSpacing),
           _TrackerCard(
@@ -383,7 +395,8 @@ class _MindfulJourneyButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed(MindfulHoursScreen.routeName),
+        onTap: () =>
+            Navigator.of(context).pushNamed(MindfulHoursScreen.routeName),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
           decoration: BoxDecoration(
@@ -994,5 +1007,3 @@ class _ChatbotActionButton extends StatelessWidget {
     );
   }
 }
-
-

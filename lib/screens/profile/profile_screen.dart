@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../Controllers/auth_controller.dart';
 import '../../core/theme.dart';
+import '../auth/signup/signup_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -11,6 +13,22 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final authController = Get.find<AuthController>();
+
+    Future<void> handleSignOut() async {
+      try {
+        await authController.logout();
+        Get.offAllNamed(SignUpScreen.routeName);
+      } catch (error) {
+        Get.snackbar(
+          'Sign out failed',
+          error.toString(),
+          backgroundColor: FreudColors.burntOrange,
+          colorText: Colors.white,
+        );
+      }
+    }
+
     return Scaffold(
       backgroundColor: FreudColors.cream,
       appBar: AppBar(
@@ -27,7 +45,8 @@ class ProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(24),
@@ -43,25 +62,47 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 30,
-                      backgroundColor: FreudColors.burntOrange.withValues(alpha: 0.12),
-                      child: const Icon(Icons.person, color: FreudColors.burntOrange, size: 28),
+                      backgroundColor:
+                          FreudColors.burntOrange.withValues(alpha: 0.12),
+                      child: const Icon(Icons.person,
+                          color: FreudColors.burntOrange, size: 28),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Shinomiya', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(Icons.local_fire_department, size: 16, color: FreudColors.mossGreen),
-                              const SizedBox(width: 6),
-                              Text('64-day streak', style: theme.textTheme.bodySmall?.copyWith(color: FreudColors.richBrown.withValues(alpha: 0.6))),
-                            ],
-                          )
-                        ],
-                      ),
+                      child: Obx(() {
+                        final user = authController.currentUser.value;
+                        final displayName = user?.displayName ?? 'Guest';
+                        final email = user?.email ?? 'guest@example.com';
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              displayName.isEmpty ? 'Hey there' : displayName,
+                              style: theme.textTheme.titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(Icons.mail_outline_rounded,
+                                    size: 16, color: FreudColors.mossGreen),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    email,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: FreudColors.richBrown
+                                          .withValues(alpha: 0.6),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }),
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit, size: 20),
@@ -71,15 +112,32 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              _ProfileTile(icon: Icons.lock_outline, label: 'Privacy & Security', onTap: () {}),
+              _ProfileTile(
+                  icon: Icons.lock_outline,
+                  label: 'Privacy & Security',
+                  onTap: () {}),
               const SizedBox(height: 10),
-              _ProfileTile(icon: Icons.palette_outlined, label: 'Appearance', onTap: () {}),
+              _ProfileTile(
+                  icon: Icons.palette_outlined,
+                  label: 'Appearance',
+                  onTap: () {}),
               const SizedBox(height: 10),
-              _ProfileTile(icon: Icons.notifications_none_rounded, label: 'Notifications', onTap: () {}),
+              _ProfileTile(
+                  icon: Icons.notifications_none_rounded,
+                  label: 'Notifications',
+                  onTap: () {}),
               const SizedBox(height: 10),
-              _ProfileTile(icon: Icons.help_outline_rounded, label: 'Help & Support', onTap: () {}),
+              _ProfileTile(
+                  icon: Icons.help_outline_rounded,
+                  label: 'Help & Support',
+                  onTap: () {}),
               const SizedBox(height: 10),
-              _ProfileTile(icon: Icons.logout, label: 'Sign Out', destructive: true, onTap: () {}),
+              _ProfileTile(
+                icon: Icons.logout,
+                label: 'Sign Out',
+                destructive: true,
+                onTap: handleSignOut,
+              ),
             ],
           ),
         ),
@@ -124,8 +182,11 @@ class _ProfileTile extends StatelessWidget {
           children: [
             Icon(icon, color: color, size: 20),
             const SizedBox(width: 12),
-            Expanded(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis)),
-            const Icon(Icons.chevron_right, color: FreudColors.richBrown, size: 18),
+            Expanded(
+                child:
+                    Text(label, maxLines: 1, overflow: TextOverflow.ellipsis)),
+            const Icon(Icons.chevron_right,
+                color: FreudColors.richBrown, size: 18),
           ],
         ),
       ),

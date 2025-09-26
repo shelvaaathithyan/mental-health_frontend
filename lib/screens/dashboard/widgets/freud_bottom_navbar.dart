@@ -67,7 +67,7 @@ class FreudBottomNavbar extends StatelessWidget {
           ),
           Positioned.fill(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -76,24 +76,28 @@ class FreudBottomNavbar extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: List.generate(2, (offset) {
                         final index = offset;
-                        return _FreudNavTile(
-                          item: items[index],
-                          isSelected: index == currentIndex,
-                          onTap: () => onItemSelected(index),
+                        return Expanded(
+                          child: _FreudNavTile(
+                            item: items[index],
+                            isSelected: index == currentIndex,
+                            onTap: () => onItemSelected(index),
+                          ),
                         );
                       }),
                     ),
                   ),
-                  const SizedBox(width: 80),
+                  const SizedBox(width: 56),
                   Expanded(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: List.generate(2, (offset) {
                         final index = offset + 2;
-                        return _FreudNavTile(
-                          item: items[index],
-                          isSelected: index == currentIndex,
-                          onTap: () => onItemSelected(index),
+                        return Expanded(
+                          child: _FreudNavTile(
+                            item: items[index],
+                            isSelected: index == currentIndex,
+                            onTap: () => onItemSelected(index),
+                          ),
                         );
                       }),
                     ),
@@ -121,17 +125,18 @@ class _FreudNavTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color iconColor =
-        isSelected ? FreudColors.mossGreen : FreudColors.richBrown.withValues(alpha: 0.45);
-    final Color labelColor =
-        isSelected ? FreudColors.mossGreen : FreudColors.richBrown.withValues(alpha: 0.55);
+    final Color iconColor = isSelected
+        ? FreudColors.mossGreen
+        : FreudColors.richBrown.withValues(alpha: 0.45);
+    final Color labelColor = isSelected
+        ? FreudColors.mossGreen
+        : FreudColors.richBrown.withValues(alpha: 0.55);
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: SizedBox(
-          width: 64,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -141,12 +146,14 @@ class _FreudNavTile extends StatelessWidget {
                 item.label,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: labelColor,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
                       fontSize: 10,
                       height: 1.0,
                     ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 2),
               AnimatedOpacity(
