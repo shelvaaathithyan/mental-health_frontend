@@ -203,6 +203,7 @@ class _TherapyChatbotScreenState extends State<TherapyChatbotScreen> {
     _chatController.lastWords.value = '';
     _chatController.isListeningDone.value = false;
     _chatController.speechToText.stop();
+    _chatController.speechToText.cancel();
     _chatController.isListening.value = false;
   }
 

@@ -214,19 +214,37 @@ When a user seeks advice on handling emotional distress, the model should provid
   Timer? noSpeechTimer;
 
   Future<void> startListening() async {
-    if (processing.value) return;
+    if (processing.value) {
+      Get.rawSnackbar(
+        title: 'One moment…',
+        message: 'I\'m still finishing your last response.',
+        duration: const Duration(seconds: 2),
+      );
+      return;
+    }
 
     loading.value = true;
 
     await stopSpeaking();
 
     try {
-      if (!speechEnabled.value) {
-        final initialized = await speechToText.initialize();
+      final hasPermission = await speechToText.hasPermission;
+      final needsInit = !speechEnabled.value || !hasPermission;
+
+      if (needsInit) {
+        final initialized = await speechToText.initialize(
+          onStatus: _handleSpeechStatus,
+          onError: _handleSpeechError,
+        );
         speechEnabled.value = initialized;
         hasMicPermission.value = initialized && await speechToText.hasPermission;
+
         if (!initialized || !hasMicPermission.value) {
-          loading.value = false;
+          Get.rawSnackbar(
+            title: 'Microphone unavailable',
+            message: 'Please allow microphone access to use voice chat.',
+            duration: const Duration(seconds: 3),
+          );
           return;
         }
       }
@@ -234,29 +252,26 @@ When a user seeks advice on handling emotional distress, the model should provid
       if (!await speechToText.hasPermission) {
         hasMicPermission.value = false;
         speechEnabled.value = false;
-        loading.value = false;
+        Get.rawSnackbar(
+          title: 'Permission required',
+          message: 'Enable microphone permissions in your device settings.',
+          duration: const Duration(seconds: 3),
+        );
         return;
       }
+
       hasMicPermission.value = true;
-    } catch (error) {
-      speechEnabled.value = false;
-      hasMicPermission.value = false;
-      loading.value = false;
-      debugPrint('Speech init failed: $error');
-      return;
-    }
 
-    if (isListening.value || speechToText.isListening) {
-      loading.value = false;
-      return;
-    }
+      if (speechToText.isListening) {
+        await speechToText.stop();
+      }
+      await speechToText.cancel();
 
-    isListeningDone.value = false;
-    lastWords.value = '';
-    transcription.value = '';
-    isListening.value = true;
+      noSpeechTimer?.cancel();
+      isListeningDone.value = false;
+      lastWords.value = '';
+      transcription.value = '';
 
-    try {
       final started = await speechToText.listen(
         onResult: onSpeechResult,
         listenFor: const Duration(seconds: 15),
@@ -264,19 +279,30 @@ When a user seeks advice on handling emotional distress, the model should provid
         listenOptions: SpeechListenOptions(partialResults: true),
       );
 
-      if (started != true) {
+      final startedSuccessfully =
+          (started == true) || speechToText.isListening;
+
+      if (!startedSuccessfully) {
         isListening.value = false;
-        loading.value = false;
+        noSpeechTimer?.cancel();
         return;
       }
 
+      isListening.value = true;
       startNoSpeechTimer();
-      loading.value = false;
     } catch (error) {
       isListening.value = false;
       noSpeechTimer?.cancel();
-      loading.value = false;
+      speechEnabled.value = false;
+      hasMicPermission.value = false;
       debugPrint('Failed to start listening: $error');
+      Get.rawSnackbar(
+        title: 'Microphone error',
+        message: 'Something went wrong while accessing the mic. Try again.',
+        duration: const Duration(seconds: 3),
+      );
+    } finally {
+      loading.value = false;
     }
   }
 

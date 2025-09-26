@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../core/theme.dart';
 import '../screens/dashboard/widgets/freud_bottom_navbar.dart';
 import '../screens/mindful_hours/mindful_hours_screen.dart';
-import '../screens/mood_tracker/mood_tracker_screen.dart';
 import '../screens/sleep_quality/sleep_quality_overview_screen.dart';
 import '../screens/therapy_chatbot/therapy_chatbot_screen.dart';
 import '../screens/journal/journal_new_screen.dart';
