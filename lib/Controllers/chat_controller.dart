@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:ai_therapy/Controllers/user_controller.dart';
 import 'package:ai_therapy/Services/api_service.dart';
+import 'package:ai_therapy/Services/chat_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -16,10 +17,12 @@ class ChatController extends GetxController {
   SpeechToText speechToText = SpeechToText();
   late final AudioPlayer _audioPlayer;
   final _apiService = ApiService();
+  final _chatService = ChatService();
   var speechEnabled = false.obs;
   var isListening = false.obs;
   var lastWords = ''.obs;
   var aiResp = ''.obs;
+  var streamingText = ''.obs; // For real-time UI updates during streaming
   var loading = false.obs;
   var processing = false.obs;
 
@@ -316,7 +319,7 @@ When a user seeks advice on handling emotional distress, the model should provid
         lastWords.value.isNotEmpty &&
         !processing.value) {
       isListeningDone.value = true;
-      await _requestGeminiResponse();
+      await _requestBackendResponse();
     }
   }
 
@@ -352,10 +355,12 @@ When a user seeks advice on handling emotional distress, the model should provid
       noSpeechTimer?.cancel(); // Cancel the timer as we've got the final result
       speechToText.stop();
       isListening.value = false;
-      _requestGeminiResponse();
+      _requestBackendResponse();
     }
   }
 
+  // Old Gemini API method - replaced with backend streaming
+  // This method is no longer used and can be removed in future cleanup
   Future<String?> _requestGeminiResponse() async {
   if (processing.value) return null;
     processing.value = true;
@@ -397,7 +402,41 @@ When a user seeks advice on handling emotional distress, the model should provid
   Future<String?> sendTextPrompt(String prompt) async {
     lastWords.value = prompt;
     isListening.value = false;
-    return _requestGeminiResponse();
+    return _requestBackendResponse();
+  }
+
+  Future<String?> _requestBackendResponse() async {
+    if (processing.value) return null;
+    processing.value = true;
+    StringBuffer responseBuffer = StringBuffer();
+
+    // Clear streaming text at start
+    streamingText.value = '';
+
+    try {
+      await for (final response in _chatService.streamChat(
+        message: lastWords.value,
+        userContext: null,
+      )) {
+        if (response.content.isNotEmpty) {
+          responseBuffer.write(response.content);
+          streamingText.value = responseBuffer.toString(); // Update streaming text for UI
+        }
+        if (response.isDone) break;
+      }
+
+      // Only set aiResp once at the end to trigger TTS
+      aiResp.value = responseBuffer.toString();
+      return responseBuffer.toString();
+    } catch (error) {
+      const errorMessage = 'I ran into an issue responding. Let\'s try again.';
+      aiResp.value = errorMessage;
+      streamingText.value = errorMessage;
+      debugPrint('Backend chat request failed: $error');
+      return aiResp.value;
+    } finally {
+      processing.value = false;
+    }
   }
 
   Future<void> stopSpeaking() async {

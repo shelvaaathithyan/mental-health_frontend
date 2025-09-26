@@ -39,6 +39,33 @@ class ChatCompletionChunk {
   }
 }
 
+class ChatRequest {
+  final String message;
+  final String? userContext;
+
+  ChatRequest({
+    required this.message,
+    this.userContext,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      if (userContext != null) 'user_context': userContext,
+    };
+  }
+}
+
+class StreamingChatResponse {
+  final String content;
+  final bool isDone;
+
+  StreamingChatResponse({
+    required this.content,
+    this.isDone = false,
+  });
+}
+
 class Choice {
   final int index;
   final Delta delta;

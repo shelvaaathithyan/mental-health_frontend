@@ -56,6 +56,68 @@ class BackendClient {
     );
   }
 
+  Stream<String> postStream(
+    String path, {
+    Map<String, dynamic>? body,
+    bool requiresAuth = true,
+    Map<String, String>? headers,
+    RequestBodyType bodyType = RequestBodyType.json,
+  }) async* {
+    final uri = Uri.parse('$baseUrl$path');
+    final effectiveHeaders = <String, String>{
+      'Accept': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      if (headers != null) ...headers,
+    };
+
+    Object? encodedBody;
+    if (body != null) {
+      switch (bodyType) {
+        case RequestBodyType.json:
+          effectiveHeaders['Content-Type'] = 'application/json';
+          encodedBody = jsonEncode(body);
+          break;
+        case RequestBodyType.formUrlEncoded:
+          effectiveHeaders['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+          encodedBody = body.entries
+              .map((entry) =>
+                  '${Uri.encodeQueryComponent(entry.key)}=${Uri.encodeQueryComponent('${entry.value}')}')
+              .join('&');
+          break;
+      }
+    }
+
+    if (requiresAuth) {
+      final token = _store.read<String>(_tokenKey);
+      final tokenType = _store.read<String>(_tokenTypeKey) ?? 'Bearer';
+      if (token == null || token.isEmpty) {
+        throw StateError('Missing authentication token for authorized request.');
+      }
+      effectiveHeaders['Authorization'] = '${_formatTokenType(tokenType)} $token';
+    }
+
+    if (kDebugMode) {
+      debugPrint('BackendClient → POST (stream) $uri');
+    }
+
+    final request = http.Request('POST', uri)
+      ..headers.addAll(effectiveHeaders);
+
+    if (encodedBody != null) {
+      request.body = encodedBody as String;
+    }
+
+    final streamedResponse = await _client.send(request);
+
+    if (streamedResponse.statusCode != 200) {
+      throw Exception('Stream request failed: ${streamedResponse.statusCode}');
+    }
+
+    await for (final chunk in streamedResponse.stream.transform(utf8.decoder)) {
+      yield chunk;
+    }
+  }
+
   Future<http.Response> _send(
     String method,
     String path, {

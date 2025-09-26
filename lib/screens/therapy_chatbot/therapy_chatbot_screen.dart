@@ -20,6 +20,7 @@ class _TherapyChatbotScreenState extends State<TherapyChatbotScreen> {
   late final TextEditingController _textController;
   late final ScrollController _scrollController;
   late final Worker _aiRespWorker;
+  late final Worker _streamingWorker;
   late final Worker _listeningDoneWorker;
   late final Worker _listeningStateWorker;
 
@@ -40,18 +41,41 @@ class _TherapyChatbotScreenState extends State<TherapyChatbotScreen> {
     _textController = TextEditingController();
     _scrollController = ScrollController();
 
+    // Worker for streaming text updates (real-time UI)
+    _streamingWorker = ever<String>(_chatController.streamingText, (value) {
+      final trimmed = value.trim();
+      if (trimmed.isEmpty) return;
+
+      // Add initial streaming message if this is the first chunk
+      if (_messages.isEmpty || _messages.last.isUser) {
+        _addMessage(
+          _ChatMessage(
+            text: trimmed,
+            isUser: false,
+            timestamp: DateTime.now(),
+            tag: _EmotionTag.thinking(),
+          ),
+        );
+      } else if (!_messages.last.isUser) {
+        // Update the last message in real-time during streaming
+        setState(() {
+          _messages.last = _ChatMessage(
+            text: trimmed,
+            isUser: false,
+            timestamp: _messages.last.timestamp,
+            tag: _EmotionTag.thinking(),
+          );
+        });
+      }
+    });
+
+    // Worker for final AI response (triggers TTS)
     _aiRespWorker = ever<String>(_chatController.aiResp, (value) {
       final trimmed = value.trim();
       if (trimmed.isEmpty || trimmed == _lastAiResponse) return;
       _lastAiResponse = trimmed;
-      _addMessage(
-        _ChatMessage(
-          text: trimmed,
-          isUser: false,
-          timestamp: DateTime.now(),
-          tag: _EmotionTag.thinking(),
-        ),
-      );
+
+      // TTS is triggered here, but message should already be added by streaming worker
       _playResponseSpeech(trimmed);
     });
 
@@ -84,6 +108,7 @@ class _TherapyChatbotScreenState extends State<TherapyChatbotScreen> {
   @override
   void dispose() {
     _aiRespWorker.dispose();
+    _streamingWorker.dispose();
     _listeningDoneWorker.dispose();
     _listeningStateWorker.dispose();
     _textController.dispose();
