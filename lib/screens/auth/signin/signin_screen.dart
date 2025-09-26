@@ -167,6 +167,49 @@ class _SignInScreenState extends State<SignInScreen> {
                     _SocialChip(icon: Icons.camera_alt_outlined),
                   ],
                 ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: _handleGuestLogin,
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: FreudColors.richBrown, width: 1.5),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                    ),
+                    child: Obx(
+                      () {
+                        final isLoading = _authController.isLoading.value;
+                        return isLoading
+                            ? const SizedBox(
+                                height: 22,
+                                width: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.4,
+                                  valueColor: AlwaysStoppedAnimation<Color>(FreudColors.richBrown),
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Continue as Guest',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: FreudColors.richBrown,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Icon(Icons.person_outline, size: 20, color: FreudColors.richBrown),
+                                ],
+                              );
+                      },
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 28),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -243,6 +286,22 @@ class _SignInScreenState extends State<SignInScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.toString()),
+          backgroundColor: FreudColors.cocoa,
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleGuestLogin() async {
+    try {
+      await _authController.guestLogin();
+      if (!mounted) return;
+      Get.offAllNamed(AssessmentFlowScreen.routeName);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to continue as guest: ${error.toString()}'),
           backgroundColor: FreudColors.cocoa,
         ),
       );

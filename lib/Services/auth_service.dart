@@ -34,6 +34,16 @@ class AuthService {
     );
   }
 
+  Future<AuthResponse> guestLogin({
+    String? displayName,
+  }) async {
+    return _authenticate(
+      path: '/auth/guest',
+      payload: displayName != null ? {'display_name': displayName} : {},
+      requiresAuth: false,
+    );
+  }
+
   Future<AuthResponse> _authenticate({
     required String path,
     required Map<String, dynamic> payload,
@@ -41,12 +51,16 @@ class AuthService {
   }) async {
     http.Response response;
     try {
+      if (kDebugMode) {
+        debugPrint('AuthService → POST $path');
+        debugPrint('AuthService → Payload: $payload');
+        debugPrint('AuthService → Requires Auth: $requiresAuth');
+      }
       response = await _client.post(
         path,
         body: payload,
         requiresAuth: requiresAuth,
-        bodyType:
-            kIsWeb ? RequestBodyType.formUrlEncoded : RequestBodyType.json,
+        bodyType: RequestBodyType.json,  // Always use JSON for auth endpoints
       );
     } on Exception catch (error) {
       if (kDebugMode) {
@@ -57,7 +71,16 @@ class AuthService {
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (kDebugMode) {
+        debugPrint('AuthService ← ${response.statusCode} ${response.reasonPhrase}');
+        debugPrint('AuthService ← Response: ${response.body}');
+      }
       return AuthResponse.fromJson(data);
+    }
+
+    if (kDebugMode) {
+      debugPrint('AuthService ← ${response.statusCode} ${response.reasonPhrase}');
+      debugPrint('AuthService ← Error Response: ${response.body}');
     }
 
     String message = 'Authentication failed with status ${response.statusCode}';

@@ -61,6 +61,14 @@ class AuthController extends GetxController {
     );
   }
 
+  Future<AuthUser> guestLogin({
+    String? displayName,
+  }) async {
+    return _performAuthAction(
+      () => _authService.guestLogin(displayName: displayName),
+    );
+  }
+
   Future<void> logout() async {
     await _store.remove(_tokenKey);
     await _store.remove(_tokenTypeKey);
